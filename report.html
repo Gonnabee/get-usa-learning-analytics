@@ -1,0 +1,455 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record &amp; Journey — Analytical Report · The Seen and The Unseen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+:root{--paper:#f6f2e9;--card:#fbf9f3;--ink:#2a2118;--soft:#6f6557;--mut:#a59a87;--line:#e4ddcd;
+ --ny:#3f7d78;--phl:#b3893f;--dc:#7c3b4b;--navy:#2d3a57;--brown:#8a6d5a;
+ --serif:'Source Serif 4',Georgia,serif;--sans:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.72;display:flex}
+/* sidebar */
+.side{width:264px;flex:none;border-right:1px solid var(--line);height:100vh;position:sticky;top:0;
+ padding:30px 22px;overflow-y:auto;background:var(--card)}
+.brand{font-family:var(--serif);font-weight:700;font-size:22px;letter-spacing:-.01em}
+.brand .en{font-style:italic;font-weight:400;font-size:13px;color:var(--soft);display:block;margin-top:2px}
+.brandk{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--dc);margin-bottom:8px}
+.nav{margin-top:26px;list-style:none}
+.nav li{display:flex;gap:11px;align-items:flex-start;padding:11px 12px;border-radius:9px;cursor:pointer;margin-bottom:2px;transition:.14s}
+.nav li:hover{background:#f1ebdd}
+.nav li.on{background:#f1ebdd}
+.nav li.on .t{color:var(--ink);font-weight:600}
+.nav li.on{box-shadow:inset 3px 0 0 var(--dc)}
+.nav .no{font-family:var(--mono);font-size:11px;color:var(--mut);margin-top:2px}
+.nav .t{font-size:13.5px;color:var(--soft);line-height:1.35}
+.nav .en{display:block;font-size:10.5px;color:var(--mut);font-family:var(--mono)}
+.sidefoot{margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.dash-btn{display:block;text-align:center;text-decoration:none;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;
+ padding:11px;border-radius:9px}
+.dash-btn .ar{color:#e8b3bd}
+/* main */
+.main{flex:1;min-width:0;max-width:1000px;margin:0 auto;padding:48px 56px 100px}
+@media(max-width:900px){body{display:block}.side{width:100%;height:auto;position:static;border-right:0;border-bottom:1px solid var(--line)}
+ .nav{display:flex;flex-wrap:wrap;gap:4px}.nav li{margin:0}.main{padding:32px 22px}}
+.page{display:none}.page.on{display:block;animation:fd .3s ease}
+@keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dc);font-weight:500}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;letter-spacing:-.01em;margin:10px 0 8px}
+h2{font-family:var(--serif);font-weight:700;font-size:21px;margin:34px 0 6px;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-family:var(--serif);font-weight:600;font-size:16px;margin:22px 0 4px}
+.lead{font-size:16.5px;color:var(--soft);max-width:680px;margin:6px 0 22px}
+p{font-size:15px;color:#34302a;margin:11px 0;max-width:720px}
+p.s{font-size:13.5px;color:var(--soft)}
+b{font-weight:600;color:var(--ink)}
+ul,ol{margin:10px 0 10px 4px;padding-left:20px}li{font-size:15px;margin:6px 0;max-width:710px}
+.q{font-family:var(--serif);font-style:italic;color:var(--soft)}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:13.5px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);font-weight:500}
+tr:hover td{background:#faf6ec}
+code{font-family:var(--mono);font-size:12.5px;background:#efe9db;padding:1px 6px;border-radius:5px}
+pre{background:#241c14;color:#ece2cf;border-radius:11px;padding:16px 18px;overflow-x:auto;font-size:12px;line-height:1.65;margin:14px 0;font-family:var(--mono)}
+pre .c{color:#a59a87}pre .k{color:#e0a0aa}pre .s{color:#9ecdb0}pre .n{color:#c9a7df}
+.call{border-left:3px solid var(--ink);background:#f1ebdd;border-radius:0 11px 11px 0;padding:14px 18px;margin:18px 0}
+.call.k{border-color:var(--ny);background:#eef4f2}
+.call.d{border-color:var(--phl);background:#f7f0e2}
+.call .cl{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--mut);margin-bottom:5px}
+.call p{margin:3px 0;font-size:14px}
+.diag{background:#241c14;color:#ece2cf;border-radius:11px;padding:16px 18px;margin:16px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85}
+.diag .h{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#b3a78f;margin-bottom:8px}
+.diag .ok{color:#9ecdb0}.diag .no{color:#e0a0aa}.diag .hi{color:#e8c98a}.diag .kk{color:#9fb6d6}
+.cards{display:grid;gap:14px;margin:18px 0}.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:760px){.c2,.c3{grid-template-columns:1fr}}
+.cd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px}
+.cd .ct{font-family:var(--serif);font-weight:600;font-size:16px;margin-bottom:3px}
+.cd .cs{font-size:13px;color:var(--soft)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;color:#fff;margin-top:8px}
+.statbar{display:flex;flex-wrap:wrap;gap:26px;margin:20px 0;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat .n{font-family:var(--serif);font-weight:700;font-size:26px;line-height:1}
+.stat .l{font-family:var(--mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut);margin-top:4px}
+svg{display:block;width:100%;overflow:visible}.axt{font-family:var(--mono);font-size:9.5px;fill:var(--mut)}
+.lab{font-family:var(--sans);font-size:11px;fill:var(--soft)}
+.chh{font-family:var(--serif);font-weight:600;font-size:15px;margin:6px 0 2px}
+.chs{font-size:12px;color:var(--soft);margin-bottom:8px}
+.pager{display:flex;justify-content:space-between;margin-top:48px;padding-top:18px;border-top:1px solid var(--line)}
+.pager a{font-family:var(--mono);font-size:12px;color:var(--dc);text-decoration:none;cursor:pointer}
+.tip{position:fixed;pointer-events:none;background:#241c14;color:#fff;font-size:12px;padding:7px 10px;border-radius:7px;opacity:0;transition:.1s;z-index:40;font-family:var(--sans)}
+.tip .m{color:#c9bda7;font-size:11px}
+</style></head><body>
+<div class="tip" id="tip"></div>
+
+<aside class="side">
+  <div class="brandk">Taejae GET USA · 2026</div>
+  <div class="brand">Record &amp; Journey<span class="en">The Seen and The Unseen</span></div>
+  <ul class="nav" id="nav">
+    <li data-p="p1" class="on"><span class="no">01</span><span class="t">Problem Definition & Analytical Objectives<span class="en">Problem & Objectives</span></span></li>
+    <li data-p="p2"><span class="no">02</span><span class="t">Data Understanding & Preparation<span class="en">Data & Preparation</span></span></li>
+    <li data-p="p3"><span class="no">03</span><span class="t">Exploratory Data Analysis<span class="en">EDA + Diagnostics</span></span></li>
+    <li data-p="p4"><span class="no">04</span><span class="t">Visualization Design & Dashboard<span class="en">Visualization Design</span></span></li>
+    <li data-p="p5"><span class="no">05</span><span class="t">Insights & Analytical Findings<span class="en">Insights & Findings</span></span></li>
+    <li data-p="p6"><span class="no">06</span><span class="t">Recommendations & Decision Support<span class="en">Recommendations</span></span></li>
+    <li data-p="p7"><span class="no">07</span><span class="t">Reflection, Limitations & Future<span class="en">Reflection & Limits</span></span></li>
+  </ul>
+  <div class="sidefoot"><a class="dash-btn" href="learning-console.dc.html" target="_blank">Live Dashboard <span class="ar">→</span></a></div>
+</aside>
+
+<main class="main">
+
+<!-- ============ 01 PROBLEM ============ -->
+<section class="page on" id="p1">
+  <div class="eyebrow">01 — Problem Definition & Analytical Objectives</div>
+  <h1>How Is Learning on a Field Study Measured?</h1>
+  <p class="lead">In a critical museology field study that asks "what is exhibited and what is concealed," we transform
+  the 750 records left by 24 students into learning analytics.</p>
+
+  <h2>Context — "The Seen and The Unseen"</h2>
+  <p>This dataset records the Taejae University GET USA study tour (2026.03.29–04.02, New York · Philadelphia · Washington DC).
+  The tour is a process of critically reading <b>what the United States exhibits (the seen) and what it conceals (the
+  unseen)</b> through space, architecture, and display; the handout assigns <b>explicit learning objectives to each site</b>.
+  We coded these objectives into five themes.</p>
+  <table>
+    <tr><th>Theme</th><th>Representative Site</th><th>Core Question (Handout)</th></tr>
+    <tr><td><b>O1</b> The Logic of Space</td><td>Met Cloisters</td><td><span class="q">Is it a museum of medieval Europe, or an American museum that aestheticizes the Middle Ages?</span></td></tr>
+    <tr><td><b>O2</b> Objects and Classification</td><td>The Met · MoMA</td><td><span class="q">What is classified as 'art' and what as 'civilization/artifact'?</span></td></tr>
+    <tr><td><b>O3</b> Public Memory and Ritual</td><td>Independence Hall · Lincoln</td><td><span class="q">How do founding and national symbols become ritual?</span></td></tr>
+    <tr><td><b>O4</b> Revealing and Concealing</td><td>NMAAHC · American Indian · Holocaust</td><td><span class="q">Which histories are made 'impossible to ignore'?</span></td></tr>
+    <tr><td><b>O5</b> Authority and Cultural Power</td><td>US Capitol · Library of Congress</td><td><span class="q">On the walls of the national library, who is left out?</span></td></tr>
+  </table>
+
+  <h2>The Problem — The Invisibility of Assessment</h2>
+  <p>Experiential field learning has great educational value, but <b>it is difficult to assess.</b> Unlike the classroom, there is no in-the-moment exam or deliverable,
+  and the instructor cannot simultaneously observe what 24 students attended to across 11 sites. The retrospective essay is a post hoc
+  reconstruction that distorts attention as it was in the moment. All three parties carry a blind spot.</p>
+  <div class="cards c3">
+    <div class="cd"><div class="ct">The Instructor's Blind Spot</div><div class="cs">There is no way to know whether students actually attended to the learning objectives of each site.</div></div>
+    <div class="cd"><div class="ct">The Peers' Blind Spot</div><div class="cs">With no space to see the thinking of peers and seniors, learning is dispersed privately.</div></div>
+    <div class="cd"><div class="ct">The Individual's Blind Spot</div><div class="cs">There is no tool to analyze for oneself "where my gaze lingered."</div></div>
+  </div>
+
+  <h2>The Contribution of Data Analysis</h2>
+  <p>FieldAtlas captures memos, photos, location, and time <b>in the moment</b> on site. This is not a retrospection but an
+  <b>unobtrusive behavioral trace</b>, revealing what a student actually paused before
+  more directly than an essay does. The analysis (1) quantifies this trace into measurable engagement,
+  (2) clusters its meaning, and (3) tests it statistically to make it visible to all three parties.</p>
+
+  <h2>Research Questions (RQ)</h2>
+  <table>
+    <tr><th>RQ</th><th>Question</th><th>Method</th></tr>
+    <tr><td>RQ1 · Distribution</td><td>When, where, and how much was attention concentrated?</td><td>Daily/hourly/weekday distributions</td></tr>
+    <tr><td>RQ2 · Depth</td><td>Which encounters produced deep reflection rather than a snapshot?</td><td>Memo length distribution · semantic clusters</td></tr>
+    <tr><td>RQ3 · Alignment</td><td>Did recorded attention match the site learning objectives?</td><td>Objective mapping · coverage</td></tr>
+    <tr><td>RQ4 · Difference</td><td>Did sites elicit different kinds of engagement, and is that difference significant?</td><td>MANOVA · Chi-square</td></tr>
+  </table>
+  <div class="call k"><div class="cl">Thesis</div>
+  <p>Using on-site behavioral traces rather than retrospection, we provide the instructor with <b>evidence of objective attainment</b>, peers with a <b>shared
+  interpretive space</b>, and the individual with a <b>mirror of their own attention</b>.</p></div>
+  <div class="pager"><span></span><a data-go="p2">02 · Data Understanding & Preparation →</a></div>
+</section>
+
+<!-- ============ 02 DATA ============ -->
+<section class="page" id="p2">
+  <div class="eyebrow">02 — Data Understanding & Preparation</div>
+  <h1>From Free-Form Text to an Analyzable Structure</h1>
+  <p class="lead">The source was free-form memos written by people, not structured data. The preprocessing required to render it
+  analyzable was half of the project.</p>
+
+  <h2>Source · Variables</h2>
+  <p>File: <code>memories_all_20260410.csv</code> · 750 rows (1 row = 1 memory) · 18 columns.</p>
+  <table>
+    <tr><th>Variable</th><th>Content</th><th>Completeness</th><th>Use</th></tr>
+    <tr><td><code>memo</code></td><td>On-site free-form text</td><td>83%</td><td>Language · depth · semantic clusters</td></tr>
+    <tr><td><code>embedding</code></td><td>3,072-dimensional semantic vector</td><td>98%</td><td>KMeans clustering · t-SNE</td></tr>
+    <tr><td><code>tags</code></td><td>Keyword tags</td><td>97%</td><td>Topic classification</td></tr>
+    <tr><td><code>location_name·lat·lon</code></td><td>Place · coordinates</td><td>82–83%</td><td>City mapping · map</td></tr>
+    <tr><td><code>photos·created_at·user_id</code></td><td>Photos · time · student</td><td>100%</td><td>engagement · time · aggregation</td></tr>
+  </table>
+
+  <h2>Data Quality Diagnostics</h2>
+  <div class="diag"><div class="h">Completeness & Quality Scan · n=750</div>
+embedding ........ <span class="ok">732/750  98%</span>   <span class="kk"># Initial 'empty column' notation was an error → restored as the basis for semantic analysis</span>
+tags ............. <span class="ok">731/750  97%</span>
+memo ............. <span class="hi">625/750  83%</span>   <span class="kk"># 17% no memo (photo only)</span>
+location_name .... <span class="hi">622/750  83%</span>
+ai_summary ....... <span class="no">  0/750   0%</span>   <span class="kk"># Not collected → excluded from analysis</span>
+dominant_colors .. <span class="no"> 22/750   3%</span>   <span class="kk"># Sparse → color-based analysis deferred</span>
+outliers ......... <span class="no">27 London coordinates</span>  <span class="kk"># Non-trip data → excluded from map and scatter</span>
+tag truncation ... <span class="no">corrupted, e.g. '박·브루·국'</span> <span class="kk"># Corrected via keyword grouping</span></div>
+
+  <h2>Preprocessing · Feature Engineering</h2>
+  <p>For each memory we computed derived variables and inlined the aggregates into the HTML (ensuring <code>file://</code> execution).</p>
+  <table>
+    <tr><th>Feature</th><th>Definition</th></tr>
+    <tr><td><code>topic</code> · 6 classes</td><td>location keyword rule: Museum&Gallery / Historic / Memorial / Park&Plaza / Street / In transit</td></tr>
+    <tr><td><code>objective</code> · 5 themes</td><td>Site → learning-objective mapping (handout-based, illustrative). 426/750 mapped</td></tr>
+    <tr><td><code>city</code></td><td>3 cities via latitude/longitude clustering</td></tr>
+    <tr><td><code>lang</code> · <code>len</code></td><td>Language detection from Hangul/Latin character ratio · memo length (depth proxy)</td></tr>
+    <tr><td><code>local_hour</code></td><td>created_at(UTC) − 4h = US Eastern</td></tr>
+    <tr><td>Embedding clusters</td><td>Normalization → KMeans (k=7, silhouette-selected) → latent themes</td></tr>
+  </table>
+<pre><span class="c"># Learning-objective mapping (handout-based)</span>
+<span class="k">def</span> obj_of(loc):
+    s = loc.lower()
+    <span class="k">if</span> <span class="s">'cloister'</span> <span class="k">in</span> s: <span class="k">return</span> <span class="s">'O1'</span>                              <span class="c"># The logic of space</span>
+    <span class="k">if</span> any(k <span class="k">in</span> s <span class="k">for</span> k <span class="k">in</span> [<span class="s">'african american'</span>,<span class="s">'holocaust'</span>,
+                            <span class="s">'american indian'</span>,<span class="s">'franklin'</span>]): <span class="k">return</span> <span class="s">'O4'</span>  <span class="c"># Revealing/concealing</span>
+    ...                                                       <span class="c"># O2·O3·O5</span></pre>
+
+  <div class="call d"><div class="cl">Consistency Check — This Data Is This Tour</div>
+  <p>The daily distribution matches the itinerary precisely: 3/29 NY (107) · 3/30 Phila (91) · 3/31–4/2 DC.
+  The top places = itinerary sites (NMAAHC · Met Cloisters · Independence · Capitol). However, since the data spans 24 days, we distinguished
+  the <b>5 core tour days</b> from the <b>New York stay period</b>.</p></div>
+  <div class="pager"><a data-go="p1">← 01</a><a data-go="p3">03 · Exploratory Data Analysis →</a></div>
+</section>
+
+<!-- ============ 03 EDA ============ -->
+<section class="page" id="p3">
+  <div class="eyebrow">03 — Exploratory Data Analysis + Diagnostics</div>
+  <h1>Exploration Determined the Design</h1>
+  <p class="lead">EDA was not ornamentation but the rationale for the design. We diagnosed distributions, relationships, and outliers, and let each finding directly
+  decide which chart it would produce.</p>
+
+  <h2>Distribution Diagnostics</h2>
+  <div class="cards c2">
+    <div class="cd"><div class="chh">Hour of Day — Morning Concentration</div><div class="chs">Memos by local hour (peak 177 at 11:00)</div><svg id="edaHour" viewBox="0 0 460 200"></svg></div>
+    <div class="cd"><div class="chh">Weekday — The Weekend Paradox</div><div class="chs">Sunday ↑154 · Saturday ↓43</div><svg id="edaDow" viewBox="0 0 460 200"></svg></div>
+  </div>
+  <p class="s">Diagnosis: <b>49% of all records</b> are concentrated between 9 a.m. and noon (right-skewed unimodal). Contrary to intuition, the weekday pattern is
+  <b>Sunday highest, Saturday lowest</b> — because Saturday was for travel and rest, while Sunday was the key visiting day.</p>
+
+  <h2>Depth Distribution — Snapshot vs. Contemplation</h2>
+  <div class="cd"><div class="chh">Memo Length Distribution</div><div class="chs">Mean 101 chars · median 38 chars · max 2,177 chars (extreme right skew)</div><svg id="edaDepth" viewBox="0 0 700 180"></svg></div>
+  <div class="diag"><div class="h">Distribution diagnostics · memo length</div>
+mean = <span class="hi">101.1</span>   median = <span class="hi">38</span>   max = <span class="hi">2177</span>   skew = <span class="no">strong right</span>
+reflection(150+ chars) = <span class="ok">117 / 625 = 19%</span>   <span class="kk"># 1 in 5 is deep contemplation</span>
+critical-thinking signals: question <span class="ok">120 (19%)</span> · reflection 52 · doubt 28 · idea 27</div>
+
+  <h2>Relationship · Outlier Diagnostics</h2>
+  <div class="diag"><div class="h">Relationship & anomaly scan</div>
+corr(memories, photos) : r = <span class="ok">0.987</span>  slope = 1.319  n = 46   <span class="kk"># Nearly proportional</span>
+→ The residual is the insight: <span class="hi">MoMA</span> 23 memos/52 photos = 2.3 per memo  <span class="kk"># Visual artworks induce extra photography</span>
+anomaly: <span class="no">1 user with 404 memos</span> (home-base) · <span class="no">27 London records</span> off-trip → handled and noted
+embedding clusters: silhouette maximized → k = <span class="ok">7</span>  <span class="kk"># 7 latent themes, separated by city</span></div>
+
+  <h2>Exploration → Visualization Choice</h2>
+  <table>
+    <tr><th>Exploration</th><th>Finding</th><th>Visualization It Led To</th></tr>
+    <tr><td>Hour/weekday distribution</td><td>49% morning · weekend paradox</td><td>Bars ×2 · heatmap</td></tr>
+    <tr><td>Memories × photos</td><td>r≈0.99, MoMA outlier</td><td>Scatter (bubble = photos)</td></tr>
+    <tr><td>Memo length</td><td>19% deep reflection</td><td>Depth histogram</td></tr>
+    <tr><td>Embedding structure</td><td>7 clusters separated by city</td><td>t-SNE semantic map</td></tr>
+    <tr><td>Objective mapping</td><td>O4 highest · O5 lowest</td><td>Radar coverage</td></tr>
+  </table>
+  <div class="pager"><a data-go="p2">← 02</a><a data-go="p4">04 · Visualization Design →</a></div>
+</section>
+
+<!-- ============ 04 VIZ ============ -->
+<section class="page" id="p4">
+  <div class="eyebrow">04 — Visualization Design & Dashboard</div>
+  <h1>Journey and Record in a Single Console</h1>
+  <p class="lead">The reader is the instructor viewing a program overview. The design principle is the clarity of editorial design plus statistical grounding,
+  and the dashboard places the lenses of all three parties (instructor · peer · individual) on a single screen.</p>
+
+  <h2>Rationale for Chart Selection</h2>
+  <table>
+    <tr><th>Panel</th><th>Chart</th><th>Rationale</th></tr>
+    <tr><td>Objective coverage</td><td>Radar (pentagon)</td><td>Compares the 5 learning objectives instantly and asymmetrically on a single axis</td></tr>
+    <tr><td>Map of the journey</td><td>Bubble timeline</td><td>Encodes time (route) + size (weight of dwelling = memos) simultaneously</td></tr>
+    <tr><td>Hour-of-day concentration</td><td>Day × hour heatmap</td><td>Dual-categorical density — on which day and at which hour did they pause?</td></tr>
+    <tr><td>Engagement vs. frequency</td><td>Scatter + bubble</td><td>Relationship between two numerical variables + photos (third variable)</td></tr>
+    <tr><td>The language of thought</td><td>100% stacked bar</td><td>Compares Korean/English composition by place type</td></tr>
+  </table>
+
+  <h2>Design Iteration (v1 → v2) — Incorporating Workshop Feedback</h2>
+  <table>
+    <tr><th>Target</th><th>v1 → v2</th></tr>
+    <tr><td>Scatter axes</td><td>Placed place as a category → reset to a <b>numerical axis</b> to make the MoMA outlier visible</td></tr>
+    <tr><td>Pace chart</td><td>Sparse from listing all dates → <b>Slope Graph</b> for segment comparison</td></tr>
+    <tr><td>City comparison</td><td>Stay period missing → per-day + added <b>statistical testing (MANOVA · χ²)</b></td></tr>
+    <tr><td>Text</td><td>Embeddings left unused → built a <b>semantic map · clusters</b> from 732 vectors</td></tr>
+    <tr><td>Overall system</td><td>Scattered pages → consolidated into a <b>single journey + record console</b> (current dashboard)</td></tr>
+  </table>
+
+  <h2>Visual System</h2>
+  <p>City colors over Paper <code>#f6f2e9</code> (Teal · NY / Ochre · Phila / Burgundy · DC / Navy). Type is the display face
+  Source Serif 4, body IBM Plex Sans KR, and data labels IBM Plex Mono. Clarity principle: small elements appear on hover,
+  and labels use automatic contrast based on background lightness.</p>
+  <a class="dash-btn" href="learning-console.dc.html" target="_blank" style="display:inline-block;padding:11px 20px;margin-top:6px">Open Live Dashboard <span class="ar">→</span></a>
+  <div class="pager"><a data-go="p3">← 03</a><a data-go="p5">05 · Insights & Findings →</a></div>
+</section>
+
+<!-- ============ 05 INSIGHTS ============ -->
+<section class="page" id="p5">
+  <div class="eyebrow">05 — Insights & Analytical Findings</div>
+  <h1>Did Attention Flow as Taught?</h1>
+  <p class="lead">The core result for RQ3: recorded attention was substantially aligned with the intended learning objectives, and the most affective
+  objective drew the greatest engagement. Yet one objective clearly fell short.</p>
+
+  <div class="cards c2" style="align-items:center">
+    <div class="cd"><div class="chh">Learning-Objective Coverage</div><div class="chs">Distribution of 426 memo→objective mappings</div><svg id="insRadar" viewBox="0 0 420 300"></svg></div>
+    <div>
+      <h3>The Strongest Objective Drew the Greatest Attention</h3>
+      <p class="s">The course-title theme <b>O4 Revealing and Concealing</b> (NMAAHC · Holocaust · American Indian) was the highest at 136 records (32%).
+      The highest-engagement site (NMAAHC, 80 records) was also the site of the deepest reflection.</p>
+      <h3>Underperforming Objective — Instructor Flag</h3>
+      <p class="s"><b>O5 Authority and Cultural Power</b> (Capitol · Library of Congress) was the lowest at 37 records (9%). The objective of "who is
+      left off the walls" was relatively <b>less engaged</b>.</p>
+    </div>
+  </div>
+
+  <h2>Statistical Diagnostics — How Do the Sites Differ?</h2>
+  <div class="diag"><div class="h">Inferential diagnostics · exact tests + effect sizes</div>
+MANOVA  City → (memories, photos)   place-level n=46  (NY 28 · Phila 6 · DC 12)
+   Wilks Λ = <span class="hi">0.955</span>   Pillai = 0.045
+   <span class="kk">exact</span> F(4,84) = <span class="hi">0.49</span>   p = <span class="no">0.747  (not significant)</span>
+   → Photos are ~1.3 per memory across all cities. <span class="kk">The 'structure' of recording is independent of city (p=2 exact F)</span>
+Chi-square  City × place type   memo-level n=554
+   χ² = <span class="hi">562</span>   df = 10   p &lt; 1e-100   Cramér's V = <span class="ok">0.71 (large)</span>
+   [place-level n=46] χ² = 28.9   p = <span class="ok">0.001</span>   V = <span class="ok">0.56 (large)</span>
+   → What was recorded differs starkly. <span class="kk">NY=streets · DC=museums/memorials · Phila=parks</span>
+GoF  Objective coverage vs uniform   mapped n=426
+   χ²(4) = <span class="hi">61.4</span>   p = <span class="ok">1.5e-12</span>   Cohen's w = <span class="ok">0.38</span>
+   → Not uniform: <span class="hi">O4 Revealing over-represented (136)</span> · <span class="no">O5 Authority under-represented (37)</span>
+<span class="no">⚠ Limitation</span>: Memos cluster within student and place (pseudoreplication) + some cells have expected frequency &lt;5
+   → <span class="kk">p-values are secondary; effect sizes (V·w) and visual patterns are the primary evidence</span></div>
+  <p class="s">A non-significant MANOVA is not a failure but a finding — <b>sites are different 'topics,' not different 'recording structures.'</b>
+  Volume and topic (V=0.56–0.71, large effect) divide the cities, whereas the photo–memo relationship does not.
+  Because of non-independence and sparse cells, we read p conservatively and treat <b>effect size as the primary evidence</b>.</p>
+
+  <h2>Key Findings — Alignment with Objectives</h2>
+  <table>
+    <tr><th>Finding</th><th>Evidence → Meaning</th></tr>
+    <tr><td>Highest engagement = NMAAHC</td><td>A single 80 records (most). The "history that cannot be ignored" objective drew the greatest attention</td></tr>
+    <tr><td>"unseen" cluster 100% DC</td><td>The Holocaust and Black-history clusters are entirely in DC → the <b>content</b> of reflection matches the intended critical themes</td></tr>
+    <tr><td>Objective-level reasoning</td><td><span class="q">"It feels like being put on display"</span> · <span class="q">"This paper seems like a symbol piercing through history and spirit"</span> → carrying out the 'space = argument' task</td></tr>
+    <tr><td>Deep reflection</td><td>19% of memos exceed 150 chars → on-site recording is not a check-in but a <b>tool for reasoning</b></td></tr>
+  </table>
+  <div class="pager"><a data-go="p4">← 04</a><a data-go="p6">06 · Recommendations & Decision Support →</a></div>
+</section>
+
+<!-- ============ 06 RECO ============ -->
+<section class="page" id="p6">
+  <div class="eyebrow">06 — Recommendations & Decision Support</div>
+  <h1>Not a Pretty Picture, but a Decision Tool</h1>
+  <p class="lead">The value of analysis is realized when it changes someone's decision. This dashboard is a
+  decision tool that fills the blind spots of all three parties.</p>
+
+  <h2>Decision Support for the Three Parties</h2>
+  <div class="cards c3">
+    <div class="cd"><div class="ct">Instructor</div><div class="cs">Objective-alignment dashboard. Reinforce the <b>low-engagement objective (O5 Authority/Power, 9%)</b> with an advance prompt on the next tour. Adjust the weight of high-engagement content (O4).</div></div>
+    <div class="cd"><div class="ct">Peers · Seniors</div><div class="cs">The semantic map = a shared interpretive space. Explore the reflections of peers and seniors by meaning, turning private learning into a collective asset.</div></div>
+    <div class="cd"><div class="ct">Individual</div><div class="cs">A personal attention trajectory. Retrace "where my gaze lingered" by site, time, and language for metacognition.</div></div>
+  </div>
+
+  <h2>Practical Recommendations</h2>
+  <ul>
+    <li><b>Morning concentration (49%)</b> → schedule core learning activities and discussions in the morning hours.</li>
+    <li><b>O5 shortfall (9%)</b> → provide a "who is left out" questionnaire in advance of visiting the Capitol and Library of Congress.</li>
+    <li><b>Convergence at the tour's end</b> → reexamine the length and density of the later itinerary.</li>
+    <li><b>Intent vs. actual loop</b> → compare objective weight (syllabus) ↔ actual record weight each term to adjust the curriculum.</li>
+  </ul>
+  <div class="call d"><div class="cl">The Decision in One Line</div>
+  <p>"The intent was X and the actual was Y, and the evidence is these memos" — design the next tour on an evidentiary basis.</p></div>
+  <div class="pager"><a data-go="p5">← 05</a><a data-go="p7">07 · Reflection, Limitations & Future →</a></div>
+</section>
+
+<!-- ============ 07 LIMITS ============ -->
+<section class="page" id="p7">
+  <div class="eyebrow">07 — Reflection, Limitations & Future</div>
+  <h1>What Can Be Trusted, and What Cannot</h1>
+  <p class="lead">Acknowledging limitations first strengthens the credibility of the analysis.</p>
+
+  <h2>Limitations</h2>
+  <table>
+    <tr><th>Category</th><th>Limitation</th><th>Implication</th></tr>
+    <tr><td>Unit of aggregation</td><td>Aggregated across 24 students, skewed by 1 person with 404 memos</td><td>Individual/peer drill-down incomplete → first-class user_id filtering needed</td></tr>
+    <tr><td>Measurement validity</td><td>Photo/memo counts are only an engagement proxy</td><td><b>'attended to' ≠ 'learned'</b> · supplement with qualitative evidence</td></tr>
+    <tr><td>Mapping</td><td>Objective mapping is a handout-based heuristic (426/750)</td><td>illustrative — the 324 unmapped records are everyday life/transit</td></tr>
+    <tr><td>Statistical assumptions</td><td>Memos are non-independent (pseudoreplication) · some cells have expected frequency &lt;5 · MANOVA normality untested</td><td>p is conservative; effect sizes (Cramér's V · Cohen's w) are the primary evidence</td></tr>
+    <tr><td>Features</td><td>Language detection, city mapping, and topic classification are rule-based</td><td>Short memos may be misclassified</td></tr>
+    <tr><td>Sample</td><td>Single cohort · single tour</td><td>Suited to diagnosing this tour rather than to generalization</td></tr>
+  </table>
+
+  <h2>Future Improvements</h2>
+  <ul>
+    <li><b>Separate three-party views</b> — individual/peer/instructor modes, with first-class user_id filtering.</li>
+    <li><b>Automate objective alignment</b> — code the site learning objectives and auto-match them to embedding clusters, auto-flagging underperforming objectives.</li>
+    <li><b>Peer sharing space</b> — accumulate the semantic map across senior cohorts to build continuity of interpretation.</li>
+    <li><b>Measurement validation</b> — model the argumentative structure and critical-thinking signals of memos to refine 'depth.'</li>
+  </ul>
+
+  <h2>Submitted Supporting Materials</h2>
+  <p class="s"><code>prep_console.py · prep_text.py</code> preprocessing · <code>feedback_stats.json</code> statistics ·
+  <code>console.html</code> live dashboard · <code>dashboard.html · 4-memory-timeline.html</code> supplementary visualizations ·
+  EDA distribution/correlation outputs · design iteration v1→v2 · MANOVA, clustering, and language code snippets.</p>
+  <div class="pager"><a data-go="p6">← 06</a><a class="dash-btn" href="learning-console.dc.html" target="_blank" style="display:inline-block;padding:9px 16px">Live Dashboard →</a></div>
+</section>
+
+</main>
+
+<script>
+const D={
+ objcov:[{id:'O1',label:'The Logic of Space',n:78,pct:18},{id:'O2',label:'Objects and Classification',n:76,pct:18},
+  {id:'O3',label:'Public Memory · Ritual',n:99,pct:23},{id:'O4',label:'Revealing and Concealing',n:136,pct:32},
+  {id:'O5',label:'Authority and Cultural Power',n:37,pct:9}],
+ hours:[9,9,0,3,1,0,9,9,6,17,61,177,107,43,41,74,37,26,41,38,17,12,6,7],
+ dow:[['Mon',107],['Tue',111],['Wed',133],['Thu',98],['Fri',99],['Sat',43],['Sun',154]],
+ depth:[['Snapshot <20',189,'#ddd2bd'],['Short 20–60',208,'#c9b487'],['Note 60–150',111,'#b3893f'],['Reflection 150+',117,'#7c3b4b']]
+};
+const OBJCOL={O1:'#3f7d78',O2:'#b3893f',O3:'#7c3b4b',O4:'#2d3a57',O5:'#8a6d5a'};
+const tip=d3.select('#tip');
+function show(e,h){tip.style('opacity',1).style('left',Math.min(e.clientX+13,innerWidth-230)+'px').style('top',(e.clientY+13)+'px').html(h);}
+function hide(){tip.style('opacity',0);}
+
+/* tab nav */
+const nav=[...document.querySelectorAll('#nav li')],pages=[...document.querySelectorAll('.page')];
+let drawn={};
+function go(id){nav.forEach(n=>n.classList.toggle('on',n.dataset.p===id));
+ pages.forEach(p=>p.classList.toggle('on',p.id===id));
+ if(location.hash.slice(1)!==id)history.replaceState(null,'','#'+id);
+ window.scrollTo({top:0});draw(id);}
+nav.forEach(n=>n.addEventListener('click',()=>go(n.dataset.p)));
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',()=>go(a.dataset.go)));
+
+function draw(id){
+ if(drawn[id])return;drawn[id]=1;
+ if(id==='p3'){edaHour();edaDow();edaDepth();}
+ if(id==='p5'){radar('#insRadar');}
+}
+function edaHour(){const H=D.hours,W=460,Ht=200,m={l:28,r:8,t:10,b:26};
+ const sv=d3.select('#edaHour');const x=d3.scaleBand().domain(d3.range(24)).range([m.l,W-m.r]).padding(.18);
+ const y=d3.scaleLinear().domain([0,d3.max(H)]).range([Ht-m.b,m.t]);
+ sv.selectAll('rect').data(H).join('rect').attr('x',(d,i)=>x(i)).attr('width',x.bandwidth())
+  .attr('y',d=>y(d)).attr('height',d=>y(0)-y(d)).attr('rx',1.5).attr('fill',(d,i)=>i===11?'#7c3b4b':'#cdbf9a')
+  .on('mousemove',(e,d)=>show(e,`<b>${H.indexOf(d)}:00</b> · ${d}`)).on('mouseleave',hide);
+ [0,6,11,12,18,23].forEach(h=>sv.append('text').attr('x',x(h)+x.bandwidth()/2).attr('y',Ht-10).attr('text-anchor','middle').attr('class','axt').text(h));}
+function edaDow(){const Wd=D.dow,W=460,Ht=200,m={l:28,r:8,t:10,b:26};
+ const sv=d3.select('#edaDow');const x=d3.scaleBand().domain(Wd.map(d=>d[0])).range([m.l,W-m.r]).padding(.25);
+ const y=d3.scaleLinear().domain([0,d3.max(Wd,d=>d[1])]).range([Ht-m.b,m.t]);
+ sv.selectAll('rect').data(Wd).join('rect').attr('x',d=>x(d[0])).attr('width',x.bandwidth())
+  .attr('y',d=>y(d[1])).attr('height',d=>y(0)-y(d[1])).attr('rx',2)
+  .attr('fill',d=>d[0]==='Sun'?'#7c3b4b':d[0]==='Sat'?'#d9cbb0':'#cdbf9a')
+  .on('mousemove',(e,d)=>show(e,`<b>${d[0]}</b> · ${d[1]}`)).on('mouseleave',hide);
+ sv.selectAll('text.x').data(Wd).join('text').attr('class','axt').attr('x',d=>x(d[0])+x.bandwidth()/2).attr('y',Ht-10).attr('text-anchor','middle').text(d=>d[0]);}
+function edaDepth(){const B=D.depth,W=700,Ht=180,m={l:10,r:10,t:12,b:30};
+ const sv=d3.select('#edaDepth');const x=d3.scaleBand().domain(B.map(d=>d[0])).range([m.l,W-m.r]).padding(.3);
+ const y=d3.scaleLinear().domain([0,d3.max(B,d=>d[1])]).range([Ht-m.b,m.t]);
+ const g=sv.selectAll('g').data(B).join('g');
+ g.append('rect').attr('x',d=>x(d[0])).attr('width',x.bandwidth()).attr('y',d=>y(d[1])).attr('height',d=>y(0)-y(d[1])).attr('rx',3).attr('fill',d=>d[2]);
+ g.append('text').attr('x',d=>x(d[0])+x.bandwidth()/2).attr('y',d=>y(d[1])-6).attr('text-anchor','middle').attr('class','lab').style('font-weight',600).text(d=>d[1]);
+ g.append('text').attr('x',d=>x(d[0])+x.bandwidth()/2).attr('y',Ht-10).attr('text-anchor','middle').attr('class','axt').text(d=>d[0]);}
+function radar(sel){const sv=d3.select(sel);const cx=160,cy=155,R=110;const obj=D.objcov,n=obj.length,mx=d3.max(obj,d=>d.pct);
+ const ang=i=>-Math.PI/2+i*2*Math.PI/n;
+ [.25,.5,.75,1].forEach(f=>sv.append('polygon').attr('points',obj.map((d,i)=>[cx+Math.cos(ang(i))*R*f,cy+Math.sin(ang(i))*R*f].join(',')).join(' ')).attr('fill','none').attr('stroke','#e4ddcd'));
+ obj.forEach((d,i)=>sv.append('line').attr('x1',cx).attr('y1',cy).attr('x2',cx+Math.cos(ang(i))*R).attr('y2',cy+Math.sin(ang(i))*R).attr('stroke','#e4ddcd'));
+ const dp=obj.map((d,i)=>{const r=R*d.pct/mx;return [cx+Math.cos(ang(i))*r,cy+Math.sin(ang(i))*r];});
+ sv.append('polygon').attr('points',dp.map(p=>p.join(',')).join(' ')).attr('fill','rgba(45,58,87,.16)').attr('stroke','#2d3a57').attr('stroke-width',2);
+ dp.forEach((p,i)=>sv.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3.5).attr('fill',OBJCOL[obj[i].id])
+   .on('mousemove',(e)=>show(e,`<b>${obj[i].label}</b> · ${obj[i].n} (${obj[i].pct}%)`)).on('mouseleave',hide));
+ obj.forEach((d,i)=>{const a=ang(i);sv.append('text').attr('x',cx+Math.cos(a)*(R+20)).attr('y',cy+Math.sin(a)*(R+15))
+   .attr('text-anchor',Math.abs(Math.cos(a))<.3?'middle':(Math.cos(a)>0?'start':'end')).attr('class','lab').style('font-weight',600).style('font-size','10.5px')
+   .style('fill',OBJCOL[d.id]).text(d.label);});}
+
+const s=location.hash.slice(1);if(s&&document.getElementById(s))go(s);else draw('p1');
+</script></body></html>

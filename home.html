@@ -1,0 +1,86 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Record & Journey — The Seen and The Unseen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f3efe6;--card:#fffdf8;--ink:#211f1b;--soft:#5d5749;--mut:#9a948a;--line:#e6e0d2;
+ --ny:#2f5d57;--phl:#9a7b3f;--dc:#6e3a36;--navy:#3f4a63;
+ --serif:'Source Serif 4',Georgia,serif;--sans:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;
+ min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px}
+.wrap{max-width:1040px;width:100%}
+.kick{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--phl);font-weight:500}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.015em;margin:14px 0 6px}
+h1 .en{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42em;color:var(--soft);display:block;margin-top:8px}
+.dek{font-size:16px;color:var(--soft);max-width:660px;margin:18px 0 8px}
+.dek b{color:var(--ink);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 36px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:7px 12px;font-size:13px}
+.chip b{font-family:var(--serif);font-weight:700}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:720px){.cards{grid-template-columns:1fr}}
+.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);
+ border-radius:14px;padding:28px 28px 24px;transition:.18s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-4px);border-color:#cdbfa3;box-shadow:0 22px 44px -28px rgba(60,40,10,.45)}
+.card .bar{position:absolute;left:0;top:0;height:4px;width:100%}
+.card .no{font-family:var(--mono);font-size:11px;color:var(--mut);letter-spacing:.1em}
+.card h2{font-family:var(--serif);font-weight:700;font-size:25px;margin:12px 0 8px;letter-spacing:-.01em}
+.card p{font-size:14px;color:var(--soft);line-height:1.6}
+.card .feat{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.card .feat span{font-family:var(--mono);font-size:10.5px;color:var(--soft);background:#f3eee2;border-radius:20px;padding:4px 9px}
+.card .go{display:inline-flex;align-items:center;gap:7px;margin-top:18px;font-weight:600;font-size:14px}
+.card .go .ar{font-weight:800}
+.b-dash .go .ar{color:var(--dc)} .b-rep .go .ar{color:var(--ny)}
+.note{margin-top:30px;font-size:12.5px;color:var(--mut);line-height:1.65;border-top:1px solid var(--line);padding-top:18px}
+.note b{color:var(--soft);font-weight:600}
+.note a{color:var(--ny);text-decoration:none;border-bottom:1px solid #bcd0cb}
+.foot{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--mut)}
+</style></head><body>
+<div class="wrap">
+  <div class="kick">Taejae University · GET USA · 2026.03.29–04.02</div>
+  <h1>Record & Journey<span class="en">The Seen and The Unseen — Measuring Learning in the Field</span></h1>
+  <p class="dek">Drawing on the <b>750 notes and 947 photographs</b> produced by 24 students during a critical museology field study,
+  we reconstruct the data as a <b>learning analysis</b> of "where they lingered, what they attended to, and how they reached the learning objectives."</p>
+
+  <div class="chips">
+    <span class="chip">Students <b>24</b></span>
+    <span class="chip">Notes <b>750</b></span>
+    <span class="chip">Photos <b>947</b></span>
+    <span class="chip">Places <b>108</b></span>
+    <span class="chip">Learning objectives <b>5</b> themes</span>
+    <span class="chip">Embeddings <b>732</b></span>
+  </div>
+
+  <div class="cards">
+    <a class="card b-dash" href="learning-console.dc.html">
+      <div class="bar" style="background:linear-gradient(90deg,#6e3a36,#9a7b3f,#2f5d57)"></div>
+      <div class="no">01 · INTERACTIVE</div>
+      <h2>Learning Analytics Dashboard</h2>
+      <p>Five views: cohort, place, learning objective, student, and diagnostics. An interactive console for exploring journeys and records through filters, hover, and drill-down.</p>
+      <div class="feat"><span>Cohort console</span><span>Journey map</span><span>Place drill-down</span><span>Objective coverage</span><span>Diagnostics</span></div>
+      <div class="go">Open dashboard <span class="ar">→</span></div>
+    </a>
+
+    <a class="card b-rep" href="report.html">
+      <div class="bar" style="background:linear-gradient(90deg,#3f4a63,#2f5d57)"></div>
+      <div class="no">02 · PRESENTATION</div>
+      <h2>Presentation Report · Rubric + Statistical Diagnostics</h2>
+      <p>Problem definition → data → EDA → visualization → insight → recommendation → limitations. The seven rubric domains appear as side tabs, complete with statistical diagnostics (exact MANOVA and effect sizes).</p>
+      <div class="feat"><span>7 rubric tabs</span><span>MANOVA F(4,84)</span><span>Cramér's V</span><span>Live diagnostic charts</span></div>
+      <div class="go">Open report <span class="ar">→</span></div>
+    </a>
+  </div>
+
+  <div class="note">
+    <b>Data and statistics note.</b> The presentation report (02) and the live-data dashboard draw on the actual export (<b>24 students · 750 notes · 947 photos</b>) and
+    <b>validated statistics</b> — for MANOVA, the p=2 exact F(4,84)=0.49, p=0.747 (non-significant); for city × topic, Cramér's V=0.56–0.71 (large);
+    and for objective fit, χ²(4)=61.4, Cohen's w=0.38. Because the notes are non-independent and some cells are sparse, we read the <b>effect sizes as the primary evidence</b>.
+    The interactive dashboard (01) is <b>computed from the same actual export</b> — the per-student breakdown reflects direct measurement by user_id in the CSV (16 of the 24 students
+    recorded at places mapped to a learning objective), and the objective coverage uses the <b>same primary-objective distribution</b> as the report (unseen 32% · authority 9%).
+    Supplementary visualizations: <a href="learning-console.dc.html">console.html</a> · <a href="learning-console.dc.html">4-memory-timeline.html</a>.
+  </div>
+  <div class="foot">Record & Journey · FieldAtlas export 2026-04-10 · n=750</div>
+</div>
+</body></html>

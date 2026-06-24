@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{font-family:'IBM Plex Sans KR','IBM Plex Sans',sans-serif;background:#f3efe6;color:#211f1b;}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#d9d1c0;border-radius:6px;border:3px solid #f3efe6;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .serif{font-family:'Source Serif 4',serif;}
+  .eyebrow{font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#9a7b3f;}
+  .card{background:#fffdf8;border:1px solid #e7e1d3;border-radius:6px;box-shadow:0 1px 2px rgba(40,32,20,.04),0 8px 26px rgba(40,32,20,.035);}
+  .sectitle{font:600 25px/1.12 'Source Serif 4',serif;letter-spacing:-.01em;}
+  .cap{font:400 13.5px/1.65 'IBM Plex Sans KR',sans-serif;color:#5d5749;}
+  .h-cap{font:600 12px 'IBM Plex Sans KR',sans-serif;color:#57534a;}
+</style>
+</helmet>
+<div style="display:flex; min-height:100vh">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside style="width:248px; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh; background:#211f1b; color:#e9e3d6; display:flex; flex-direction:column; padding:26px 18px">
+    <div style="padding:0 8px">
+      <div style="font:500 10px/1 'IBM Plex Mono',monospace; letter-spacing:.16em; color:#9a7b3f">TAEJAE · GET-US · 2026</div>
+      <div style="font:600 19px/1.2 'Source Serif 4',serif; margin-top:10px; color:#fbf8f1">Record &amp; Journey</div>
+      <div style="font:400 11.5px/1.5 'IBM Plex Sans KR',sans-serif; color:#a39a8a; margin-top:6px">The Seen &amp; The Unseen — Learning signals read through students' memos and photos</div>
+    </div>
+
+    <div style="height:1px; background:#3a362f; margin:22px 0 16px"></div>
+
+    <nav style="display:flex; flex-direction:column; gap:4px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+        <div onClick="{{ n.onClick }}" style="cursor:pointer; padding:11px 12px; border-radius:6px; display:flex; flex-direction:column; gap:2px; background: {{ n.bg }}; transition:background .15s">
+          <span style="font:600 13px 'IBM Plex Sans KR',sans-serif; color: {{ n.color }}">{{ n.label }}</span>
+          <span style="font:400 10.5px 'IBM Plex Mono',monospace; color:#8a8170">{{ n.sub }}</span>
+        </div>
+      </sc-for>
+    </nav>
+
+    <sc-if value="{{ isStudents }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:18px">
+        <div style="font:500 9.5px 'IBM Plex Mono',monospace; letter-spacing:.12em; color:#8a8170; padding:0 10px 8px">Select student · {{ studentCount }}</div>
+        <div style="display:flex; flex-direction:column; gap:1px; max-height:42vh; overflow:auto">
+          <sc-for list="{{ studentNav }}" as="s" hint-placeholder-count="14">
+            <div onClick="{{ s.onClick }}" style="cursor:pointer; display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:5px; background: {{ s.bg }}">
+              <span style="width:7px; height:7px; border-radius:50%; background: {{ s.cityColor }}"></span>
+              <span style="font:500 11.5px 'IBM Plex Mono',monospace; color: {{ s.color }}">{{ s.id }}</span>
+              <span style="font:400 10px 'IBM Plex Sans KR',sans-serif; color:#8a8170; margin-left:auto">{{ s.tag }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="margin-top:auto; padding:14px 10px 0; font:400 10px/1.5 'IBM Plex Mono',monospace; color:#6f685b">{{ sideStat }}</div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main style="flex:1; min-width:0; padding:34px 44px 80px; max-width:1180px">
+
+    <div style="margin-bottom:26px">
+      <div class="eyebrow">{{ viewKicker }}</div>
+      <div class="serif" style="font-size:34px; font-weight:600; letter-spacing:-.015em; margin-top:8px">{{ viewTitle }}</div>
+      <div class="cap" style="max-width:680px; margin-top:8px">{{ viewSub }}</div>
+    </div>
+
+    <!-- ===================== COHORT VIEW ===================== -->
+    <sc-if value="{{ isCohort }}" hint-placeholder-val="{{ true }}">
+      <div>
+        <!-- KPI -->
+        <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:1px; background:#e7e1d3; border:1px solid #e7e1d3; border-radius:6px; overflow:hidden; margin-bottom:30px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="6">
+            <div style="background:#fffdf8; padding:16px 16px">
+              <div class="serif" style="font-size:26px; font-weight:600; color:#211f1b">{{ k.v }}</div>
+              <div class="mono" style="font-size:9.5px; letter-spacing:.05em; text-transform:uppercase; color:#9a948a; margin-top:6px">{{ k.l }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- 01 THE TRAIL / SWARM -->
+        <div class="card" style="padding:26px 28px; margin-bottom:24px">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px">
+            <div style="max-width:560px">
+              <div class="eyebrow" style="color:#c0392b">01 — THE TRAIL</div>
+              <div class="sectitle" style="margin-top:8px">Every place where students paused</div>
+              <div class="cap" style="margin-top:8px">{{ capTrail }}</div>
+            </div>
+            <div style="display:flex; gap:14px; flex-wrap:wrap">
+              <div style="display:flex; flex-direction:column; gap:5px">
+                <span class="mono" style="font-size:9px; letter-spacing:.1em; color:#9a948a">LANES · COLOR</span>
+                <div style="display:flex; background:#efe9db; border-radius:7px; padding:3px">
+                  <div onClick="{{ setColorPlace }}" style="cursor:pointer; padding:6px 12px; border-radius:5px; font:500 11px 'IBM Plex Sans KR',sans-serif; background: {{ colorPlaceBg }}; color: {{ colorPlaceFg }}">By city</div>
+                  <div onClick="{{ setColorTopic }}" style="cursor:pointer; padding:6px 12px; border-radius:5px; font:500 11px 'IBM Plex Sans KR',sans-serif; background: {{ colorTopicBg }}; color: {{ colorTopicFg }}">By topic</div>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:5px">
+                <span class="mono" style="font-size:9px; letter-spacing:.1em; color:#9a948a">SIZE</span>
+                <div style="display:flex; background:#efe9db; border-radius:7px; padding:3px">
+                  <div onClick="{{ setSizeMem }}" style="cursor:pointer; padding:6px 12px; border-radius:5px; font:500 11px 'IBM Plex Sans KR',sans-serif; background: {{ sizeMemBg }}; color: {{ sizeMemFg }}">Memos</div>
+                  <div onClick="{{ setSizePhoto }}" style="cursor:pointer; padding:6px 12px; border-radius:5px; font:500 11px 'IBM Plex Sans KR',sans-serif; background: {{ sizePhotoBg }}; color: {{ sizePhotoFg }}">Photos</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; margin:16px 0 6px">
+            <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:6px; font:400 11px 'IBM Plex Sans KR',sans-serif; color:#57534a"><span style="width:10px; height:10px; border-radius:50%; background: {{ l.color }}"></span>{{ l.label }}</div>
+            </sc-for>
+          </div>
+          <div style="margin-top:4px">{{ swarm }}</div>
+        </div>
+
+        <!-- two-up: anchors + scatter -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px">
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">02 — THE ANCHORS</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">Where students lingered longest</div>
+            <div class="cap" style="margin-top:7px; font-size:12.5px">{{ capAnchors }}</div>
+            <div style="margin-top:16px">{{ anchorBars }}</div>
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">03 — BREADTH vs DEPTH</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">Places passed through, places dwelt in</div>
+            <div class="cap" style="margin-top:7px; font-size:12.5px">{{ capScatter }}</div>
+            <div style="margin-top:12px">{{ scatter }}</div>
+          </div>
+        </div>
+
+        <!-- rhythm + voice + topic -->
+        <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:24px; margin-bottom:24px">
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">04 — THE RHYTHM</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">When during the day attention peaked</div>
+            <div class="cap" style="margin-top:7px; font-size:12.5px">{{ capRhythm }}</div>
+            <div style="margin-top:14px">{{ rhythm }}</div>
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">05 — THE VOICE</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">The language thought arrives in</div>
+            <div class="cap" style="margin-top:7px; font-size:12.5px">{{ capVoice }}</div>
+            <div style="display:flex; align-items:center; gap:16px; margin-top:14px; padding-bottom:14px; border-bottom:1px solid #f0ebdf">
+              {{ langDonut }}
+              <div style="font:400 12px/1.6 'IBM Plex Sans KR',sans-serif; color:#57534a">The <b style="color:#6e3a36">share of Korean</b> across all memos in the cohort. Higher in museums and lower on the streets — examine the pattern by place type below.</div>
+            </div>
+            <div style="margin-top:16px">
+              <sc-for list="{{ langBars }}" as="r" hint-placeholder-count="5">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex; justify-content:space-between; font:500 11px 'IBM Plex Sans KR',sans-serif; color:#57534a; margin-bottom:4px"><span>{{ r.t }}</span><span class="mono" style="color:#9a948a">{{ r.notes }} notes</span></div>
+                  <div style="display:flex; height:14px; border-radius:3px; overflow:hidden; background:#f1ece0">
+                    <div style="width: {{ r.kr }}%; background:#6e3a36"></div>
+                    <div style="width: {{ r.en }}%; background:#c7b29a"></div>
+                    <div style="width: {{ r.other }}%; background:#e2d8c6"></div>
+                  </div>
+                </div>
+              </sc-for>
+              <div style="display:flex; gap:14px; margin-top:6px; font:400 10px 'IBM Plex Sans KR',sans-serif; color:#6c665a">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#6e3a36"></span>Korean</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#c7b29a"></span>English</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:9px;height:9px;border-radius:2px;background:#e2d8c6"></span>Other</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- topic + obj summary -->
+        <div style="display:grid; grid-template-columns:1fr 1.3fr; gap:24px">
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">06 — THE ATTENTION</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">What drew the eye</div>
+            <div style="display:flex; align-items:center; gap:18px; margin-top:16px">
+              {{ topicDonut }}
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <sc-for list="{{ topics }}" as="t" hint-placeholder-count="6">
+                  <div style="display:flex; align-items:center; gap:8px; font:400 12px 'IBM Plex Sans KR',sans-serif; color:#57534a"><span style="width:11px; height:11px; border-radius:3px; background: {{ t.color }}"></span>{{ t.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="eyebrow" style="color:#c0392b">07 — OBJECTIVE COVERAGE</div>
+            <div class="sectitle" style="font-size:21px; margin-top:8px">Learning objective coverage</div>
+            <div class="cap" style="margin-top:7px; font-size:12.5px">{{ capObj }}</div>
+            <div style="margin-top:14px">
+              <sc-for list="{{ objMini }}" as="o" hint-placeholder-count="5">
+                <div style="display:grid; grid-template-columns:26px 1fr 42px; align-items:center; gap:12px; padding:7px 0; border-bottom:1px solid #f0ebdf">
+                  <span class="mono" style="font-size:11px; color:#9a7b3f">{{ o.num }}</span>
+                  <div>
+                    <div style="font:500 12px 'IBM Plex Sans KR',sans-serif; color:#211f1b; margin-bottom:4px">{{ o.kr }}</div>
+                    <div style="background:#f1ece0; border-radius:3px; height:8px; overflow:hidden"><div style="height:100%; width: {{ o.pct }}%; background:#2f5d57; border-radius:3px"></div></div>
+                  </div>
+                  <span class="mono" style="font-size:12px; color:#57534a; text-align:right">{{ o.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== MOSAIC + MAP (cohort) ===================== -->
+    <sc-if value="{{ isCohort }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:24px">
+        <div class="card" style="padding:26px 28px; margin-bottom:24px">
+          <div class="eyebrow" style="color:#c0392b">08 — THE MOSAIC</div>
+          <div class="sectitle" style="margin-top:8px">The places that make up a city</div>
+          <div class="cap" style="margin-top:8px; max-width:700px">{{ capMosaic }}</div>
+          <div style="margin-top:18px">{{ mosaic }}</div>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:14px">
+            <sc-for list="{{ topicLegend }}" as="l" hint-placeholder-count="6">
+              <div style="display:flex; align-items:center; gap:6px; font:400 11px 'IBM Plex Sans KR',sans-serif; color:#57534a"><span style="width:11px; height:11px; border-radius:3px; background: {{ l.color }}"></span>{{ l.label }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div class="card" style="padding:26px 28px; margin-bottom:24px">
+          <div class="eyebrow" style="color:#c0392b">09 — THE MAP</div>
+          <div class="sectitle" style="margin-top:8px">The diagonal of the East Coast</div>
+          <div class="cap" style="margin-top:8px; max-width:700px">{{ capMap }}</div>
+          <div style="margin-top:16px">{{ map }}</div>
+        </div>
+        <div class="card" style="padding:26px 28px">
+          <div class="eyebrow" style="color:#c0392b">10 — THE TIMETABLE</div>
+          <div class="sectitle" style="margin-top:8px">Itinerary × engagement</div>
+          <div class="cap" style="margin-top:8px; max-width:700px">{{ capTimetable }}</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-top:14px">
+            <span class="mono" style="font-size:9px; color:#9a948a">Low engagement</span>
+            <div style="flex:0 0 160px; height:10px; border-radius:5px; background:linear-gradient(90deg, rgba(110,58,54,.13), rgba(110,58,54,.97))"></div>
+            <span class="mono" style="font-size:9px; color:#9a948a">High</span>
+            <span style="display:flex; align-items:center; gap:6px; margin-left:14px; font:400 10px 'IBM Plex Sans KR',sans-serif; color:#9a948a"><span style="width:11px;height:11px;border-radius:3px;background:#ece6d8"></span>Transit · meals · seminars</span>
+          </div>
+          <div style="margin-top:14px">{{ timetable }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== PLACES GRID ===================== -->
+    <sc-if value="{{ showPlaceGrid }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(264px,1fr)); gap:16px">
+        <sc-for list="{{ placeCards }}" as="p" hint-placeholder-count="14">
+          <div onClick="{{ p.onClick }}" class="card" style="padding:18px 20px; cursor:pointer" style-hover="box-shadow:0 4px 14px rgba(40,32,20,.12); border-color:#cdbfa3">
+            <div style="display:flex; align-items:center; gap:8px">
+              <span style="width:9px;height:9px;border-radius:50%;background: {{ p.cityColor }}"></span>
+              <span style="font:500 10px 'IBM Plex Sans KR',sans-serif; color:#9a7b3f; background:#faf3e6; padding:3px 8px; border-radius:999px">{{ p.topicKR }}</span>
+              <span class="mono" style="font-size:9.5px; color:#9a948a; margin-left:auto">{{ p.students }} students recorded</span>
+            </div>
+            <div class="serif" style="font-size:16px; font-weight:600; margin-top:11px; line-height:1.25">{{ p.name }}</div>
+            <div style="display:flex; gap:16px; margin-top:13px">
+              <div><div class="serif" style="font-size:18px;font-weight:600">{{ p.mem }}</div><div class="mono" style="font-size:8.5px;color:#9a948a;margin-top:2px">Memos</div></div>
+              <div><div class="serif" style="font-size:18px;font-weight:600">{{ p.depth }}</div><div class="mono" style="font-size:8.5px;color:#9a948a;margin-top:2px">Avg. depth</div></div>
+              <div><div class="serif" style="font-size:18px;font-weight:600">{{ p.photo }}</div><div class="mono" style="font-size:8.5px;color:#9a948a;margin-top:2px">Photos</div></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===================== PLACE DETAIL ===================== -->
+    <sc-if value="{{ showPlaceDetail }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div onClick="{{ backToPlaces }}" style="cursor:pointer; font:500 12px 'IBM Plex Sans KR',sans-serif; color:#6c665a; margin-bottom:20px">‹ All places</div>
+        <div class="card" style="padding:26px 30px; margin-bottom:22px">
+          <div style="display:flex; align-items:center; gap:9px"><span style="width:10px;height:10px;border-radius:50%;background: {{ curPlace.cityColor }}"></span><span class="mono" style="font-size:10.5px; color:#9a948a">{{ curPlace.city }} · {{ curPlace.topicKR }}</span></div>
+          <div class="serif" style="font-size:27px; font-weight:600; margin-top:8px; letter-spacing:-.01em">{{ curPlace.name }}</div>
+          <div style="display:flex; gap:30px; margin-top:18px; flex-wrap:wrap">
+            <div><div class="serif" style="font-size:23px;font-weight:600">{{ curPlace.mem }}</div><div class="mono" style="font-size:9px;color:#9a948a;margin-top:3px">Memos</div></div>
+            <div><div class="serif" style="font-size:23px;font-weight:600">{{ curPlace.photo }}</div><div class="mono" style="font-size:9px;color:#9a948a;margin-top:3px">Photos</div></div>
+            <div><div class="serif" style="font-size:23px;font-weight:600">{{ curPlace.depth }}</div><div class="mono" style="font-size:9px;color:#9a948a;margin-top:3px">Avg. depth</div></div>
+            <div><div class="serif" style="font-size:23px;font-weight:600; color:#2f5d57">{{ curPlace.students }}</div><div class="mono" style="font-size:9px;color:#9a948a;margin-top:3px">Students recorded</div></div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px">
+          <sc-for list="{{ curPlace.compare }}" as="c" hint-placeholder-count="4">
+            <div class="card" style="padding:15px 18px">
+              <div class="mono" style="font-size:9px; color:#9a948a; text-transform:uppercase; letter-spacing:.04em">{{ c.label }}</div>
+              <div class="serif" style="font-size:20px; font-weight:600; margin-top:6px">{{ c.val }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ curPlace.hasPhotos }}" hint-placeholder-val="{{ true }}">
+          <div class="card" style="padding:26px 28px; margin-bottom:22px">
+            <div class="h-cap" style="margin-bottom:4px">Key photos and notes</div>
+            <div class="cap" style="font-size:12px; margin-bottom:16px">Scenes students captured at this place, with the memos they left alongside them — the photos are placeholders.</div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px">
+              <sc-for list="{{ curPlace.photos }}" as="ph" hint-placeholder-count="3">
+                <div style="border:1px solid #ece5d6; border-radius:8px; overflow:hidden; background:#fffdf8">
+                  <div style="aspect-ratio:4/3; background:repeating-linear-gradient(135deg,#efe9db,#efe9db 9px,#e6dfce 9px,#e6dfce 18px); position:relative; display:flex; align-items:flex-end; padding:9px">
+                    <span class="mono" style="position:absolute; top:9px; left:10px; font-size:8.5px; color:#a79c88">photo · {{ ph.id }}</span>
+                    <span style="font:600 9.5px 'IBM Plex Sans KR',sans-serif; color:#9a7b3f; background:#fffdf8; padding:4px 9px; border-radius:999px; box-shadow:0 1px 2px rgba(0,0,0,.06)">{{ ph.theme }}</span>
+                  </div>
+                  <div style="padding:12px 13px">
+                    <div style="font:400 12.5px/1.5 'IBM Plex Sans KR',sans-serif; color:#3f3b33">{{ ph.note }}</div>
+                    <div class="mono" style="font-size:9.5px; color:#9a948a; margin-top:7px">— {{ ph.id }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="margin-bottom:10px">Meta-analysis — synthesis of reflections</div>
+            <div style="font:400 14px/1.75 'IBM Plex Sans KR',sans-serif; color:#3f3b33">{{ curPlace.synth }}</div>
+            <div style="margin-top:16px; background:#faf6ee; border-radius:7px; padding:14px 16px; border-left:3px solid #9a7b3f">
+              <div class="mono" style="font-size:9px; letter-spacing:.08em; color:#9a7b3f; margin-bottom:6px">META — patterns of observation</div>
+              <div style="font:400 12.5px/1.6 'IBM Plex Sans KR',sans-serif; color:#4a463d">{{ curPlace.meta }}</div>
+            </div>
+
+            <div class="h-cap" style="margin-top:22px; margin-bottom:12px">Recurring observation themes</div>
+            <sc-for list="{{ curPlace.themes }}" as="t" hint-placeholder-count="4">
+              <div style="margin-bottom:11px">
+                <div style="display:flex; justify-content:space-between; font:500 12px 'IBM Plex Sans KR',sans-serif; color:#211f1b; margin-bottom:4px"><span>{{ t.n }}</span><span class="mono" style="color:#9a948a">{{ t.pct }}%</span></div>
+                <div style="background:#f1ece0; border-radius:4px; height:10px; overflow:hidden"><div style="height:100%; width: {{ t.w }}%; background:#6e3a36; border-radius:4px"></div></div>
+              </div>
+            </sc-for>
+
+            <div class="h-cap" style="margin-top:20px; margin-bottom:10px">Keywords</div>
+            <div style="display:flex; flex-wrap:wrap; gap:7px">
+              <sc-for list="{{ curPlace.keywords }}" as="k" hint-placeholder-count="6">
+                <span style="font:500 11px 'IBM Plex Sans KR',sans-serif; background:#efe9db; color:#5d5749; padding:5px 11px; border-radius:999px">{{ k }}</span>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:22px">
+            <div class="card" style="padding:22px 24px">
+              <div class="h-cap" style="margin-bottom:14px">Distribution of stances</div>
+              <sc-for list="{{ curPlace.stance }}" as="s" hint-placeholder-count="3">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex; justify-content:space-between; font:500 11.5px 'IBM Plex Sans KR',sans-serif; color:#57534a; margin-bottom:4px"><span>{{ s.n }}</span><span class="mono" style="color:#9a948a">{{ s.pct }}%</span></div>
+                  <div style="background:#f1ece0; border-radius:4px; height:10px; overflow:hidden"><div style="height:100%; width: {{ s.pct }}%; background: {{ s.color }}; border-radius:4px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+            <div class="card" style="padding:22px 24px">
+              <div class="h-cap" style="margin-bottom:10px">Contribution to learning objectives</div>
+              <sc-if value="{{ curPlace.hasObj }}" hint-placeholder-val="{{ true }}">
+                <div>
+                  <sc-for list="{{ curPlace.objBars }}" as="b" hint-placeholder-count="4">
+                    <div style="margin-bottom:10px">
+                      <div style="display:flex; justify-content:space-between; font:500 11px 'IBM Plex Sans KR',sans-serif; color:#57534a; margin-bottom:4px"><span>{{ b.n }}</span><span class="mono" style="color:#9a948a">{{ b.pct }}%</span></div>
+                      <div style="background:#f1ece0; border-radius:3px; height:8px; overflow:hidden"><div style="height:100%; width: {{ b.pct }}%; background:#2f5d57; border-radius:3px"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ curPlace.hasObj }}" hint-placeholder-val="{{ false }}">
+                <div style="font:400 12px/1.5 'IBM Plex Sans KR',sans-serif; color:#9a948a">The direct link to learning objectives is relatively weak here (everyday and transit spaces).</div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:24px 26px">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px"><span class="h-cap">Distribution of note length</span><span class="mono" style="font-size:10px; color:#9a948a">Median {{ curPlace.medTxt }}</span></div>
+            <div class="cap" style="font-size:11.5px; margin-bottom:10px">Distribution of each student's average memo length — farther right means deeper reflection.</div>
+            {{ placeHist }}
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="h-cap" style="margin-bottom:10px">The language of thought</div>
+            <div style="display:flex; align-items:center; gap:16px">
+              {{ placeLangDonut }}
+              <div style="display:flex; flex-direction:column; gap:8px; font:400 11.5px 'IBM Plex Sans KR',sans-serif; color:#57534a">
+                <span style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:3px;background:#6e3a36"></span>Korean {{ curPlace.krPctTxt }}</span>
+                <span style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:3px;background:#c7b29a"></span>English</span>
+                <span style="display:flex;align-items:center;gap:7px"><span style="width:10px;height:10px;border-radius:3px;background:#e2d8c6"></span>Other</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <sc-if value="{{ curPlace.hasNotes }}" hint-placeholder-val="{{ false }}">
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="margin-bottom:14px">Student note feed</div>
+            <div style="display:flex; flex-direction:column">
+              <sc-for list="{{ curPlace.notes }}" as="n" hint-placeholder-count="5">
+                <div style="display:flex; gap:16px; align-items:flex-start; padding:13px 0; border-bottom:1px solid #f0ebdf">
+                  <div style="width:96px; flex-shrink:0">
+                    <div class="mono" style="font-size:11.5px; font-weight:500; color:#211f1b">{{ n.id }}</div>
+                    <div style="display:flex; gap:5px; margin-top:6px; flex-wrap:wrap">
+                      <span class="mono" style="font-size:8.5px; color:#fff; background: {{ n.langColor }}; padding:2px 6px; border-radius:3px">{{ n.lang }}</span>
+                      <span class="mono" style="font-size:8.5px; color:#9a948a">{{ n.len }} chars</span>
+                    </div>
+                    <span style="display:inline-block; margin-top:6px; font:500 9.5px 'IBM Plex Sans KR',sans-serif; color:#9a7b3f; background:#faf3e6; padding:3px 8px; border-radius:999px">{{ n.theme }}</span>
+                  </div>
+                  <div style="flex:1; border-left:2px solid #ece5d6; padding-left:16px; font:400 13px/1.65 'IBM Plex Sans KR',sans-serif; color:#3f3b33">{{ n.text }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ===================== DIAGNOSIS ===================== -->
+    <sc-if value="{{ isDiagnose }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div class="card" style="padding:30px 34px; margin-bottom:22px; background:#211f1b; border-color:#211f1b; display:flex; gap:28px; align-items:center; flex-wrap:wrap">
+          <div style="flex:1; min-width:320px">
+            <div class="mono" style="font-size:10px; letter-spacing:.14em; color:#9a7b3f">COHORT VERDICT</div>
+            <div class="serif" style="font-size:27px; font-weight:600; color:#fbf8f1; margin-top:10px">{{ diag.verdict }}</div>
+            <div style="font:400 14px/1.7 'IBM Plex Sans KR',sans-serif; color:#cabfae; margin-top:12px; max-width:680px">{{ diag.summary }}</div>
+          </div>
+          <div style="background:#2b2823; border-radius:10px; padding:16px 20px; text-align:center">
+            <div style="filter:brightness(1.1)">{{ diagScoreRing }}</div>
+            <div class="mono" style="font-size:9px; color:#9a7b3f; margin-top:4px; letter-spacing:.06em">Mean objective coverage</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:24px 28px; margin-bottom:22px">
+          <div class="h-cap" style="margin-bottom:16px">Learning objective coverage — five themes</div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px">
+            <sc-for list="{{ diag.rings }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex; flex-direction:column; align-items:center; gap:8px">
+                {{ r.ring }}
+                <div style="font:500 11px 'IBM Plex Sans KR',sans-serif; color:#57534a; text-align:center">{{ r.kr }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="color:#2f5d57; margin-bottom:14px">Strengths</div>
+            <div style="display:flex; flex-direction:column; gap:14px">
+              <sc-for list="{{ diag.strengths }}" as="s" hint-placeholder-count="3">
+                <div style="display:flex; gap:12px"><span style="color:#2f5d57; font-size:15px; line-height:1.3">▲</span><div><div style="font:600 13px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ s.t }}</div><div style="font:400 12px/1.55 'IBM Plex Sans KR',sans-serif; color:#6c665a; margin-top:3px">{{ s.d }}</div></div></div>
+              </sc-for>
+            </div>
+          </div>
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="color:#c0392b; margin-bottom:14px">Gaps</div>
+            <div style="display:flex; flex-direction:column; gap:14px">
+              <sc-for list="{{ diag.gaps }}" as="g" hint-placeholder-count="4">
+                <div style="display:flex; gap:12px"><span style="color:#c0392b; font-size:15px; line-height:1.3">▼</span><div><div style="font:600 13px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ g.t }}</div><div style="font:400 12px/1.55 'IBM Plex Sans KR',sans-serif; color:#6c665a; margin-top:3px">{{ g.d }}</div></div></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="margin-bottom:6px">Student distribution — breadth × depth</div>
+            <div class="cap" style="font-size:11.5px; margin-bottom:8px">The dashed lines mark the medians. <b style="color:#c0392b">Students needing attention</b> are highlighted in the lower-right (broad but shallow) and lower-left (narrow and shallow) quadrants.</div>
+            {{ diagQuadrant }}
+          </div>
+          <div class="card" style="padding:26px 28px">
+            <div class="h-cap" style="margin-bottom:14px">Learning objective balance</div>
+            <sc-for list="{{ diag.objBalance }}" as="o" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:120px 1fr 40px; align-items:center; gap:12px; margin-bottom:11px">
+                <div style="font:500 11.5px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ o.kr }}</div>
+                <div style="background:#f1ece0; border-radius:4px; height:12px; overflow:hidden"><div style="height:100%; width: {{ o.pct }}%; background: {{ o.barColor }}; border-radius:4px"></div></div>
+                <div class="mono" style="font-size:11.5px; color:#57534a; text-align:right">{{ o.pct }}%</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="card" style="padding:26px 28px; margin-bottom:22px">
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px"><span class="h-cap">Students needing attention</span><span class="mono" style="font-size:11px; color:#c0392b">{{ diag.flagCount }} students · by severity</span></div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <sc-for list="{{ diag.flags }}" as="f" hint-placeholder-count="4">
+              <div style="display:grid; grid-template-columns:130px 1fr 1fr 120px; align-items:center; gap:16px; padding:12px 14px; background:#faf6ee; border-radius:7px">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span style="width:9px; height:9px; border-radius:50%; background: {{ f.sevColor }}"></span>
+                  <div>
+                    <div class="mono" style="font-size:12.5px; font-weight:500; color:#211f1b">{{ f.id }}</div>
+                    <div style="font:400 9.5px 'IBM Plex Sans KR',sans-serif; color:#9a948a; margin-top:2px">{{ f.tag }}</div>
+                  </div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font:400 9.5px 'IBM Plex Mono',monospace; color:#9a948a; margin-bottom:3px"><span>Depth</span><span>{{ f.depthVal }} · {{ f.depthDelta }}</span></div>
+                  <div style="background:#e9e2d2; border-radius:3px; height:7px; overflow:hidden"><div style="height:100%; width: {{ f.depthPct }}%; background:#6e3a36; border-radius:3px"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font:400 9.5px 'IBM Plex Mono',monospace; color:#9a948a; margin-bottom:3px"><span>Objectives</span><span>{{ f.objVal }} · {{ f.objDelta }}</span></div>
+                  <div style="background:#e9e2d2; border-radius:3px; height:7px; overflow:hidden"><div style="height:100%; width: {{ f.objPct }}%; background:#2f5d57; border-radius:3px"></div></div>
+                </div>
+                <div style="font:500 10.5px 'IBM Plex Sans KR',sans-serif; color:#c0392b; text-align:right">{{ f.issues }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div class="card" style="padding:26px 28px">
+          <div class="h-cap" style="margin-bottom:16px">Recommendations for the next tour</div>
+          <div style="display:flex; flex-direction:column; gap:14px">
+            <sc-for list="{{ diag.recs }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex; gap:14px; align-items:flex-start; padding-bottom:14px; border-bottom:1px solid #f0ebdf">
+                <span class="serif" style="font-size:17px; font-weight:600; color:#e0d5bf; line-height:1.2">{{ r.num }}</span>
+                <div style="flex:1">
+                  <div style="font:400 13.5px/1.6 'IBM Plex Sans KR',sans-serif; color:#3f3b33">{{ r.text }}</div>
+                  <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap">
+                    <span style="font:600 9.5px 'IBM Plex Sans KR',sans-serif; color:#fff; background: {{ r.priColor }}; padding:4px 9px; border-radius:999px">{{ r.pri }}</span>
+                    <span class="mono" style="font-size:9.5px; color:#9a948a; background:#f1ece0; padding:4px 9px; border-radius:999px">{{ r.affect }}</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== OBJECTIVES VIEW ===================== -->
+    <sc-if value="{{ isObjectives }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:24px">
+        <sc-for list="{{ objList }}" as="o" hint-placeholder-count="5">
+          <div class="card" style="padding:30px 32px">
+            <div style="display:flex; gap:24px; flex-wrap:wrap">
+              <div style="flex:1; min-width:300px">
+                <div style="display:flex; align-items:baseline; gap:12px">
+                  <span class="serif" style="font-size:38px; font-weight:600; color:#e0d5bf; line-height:1">{{ o.num }}</span>
+                  <div>
+                    <div class="serif" style="font-size:24px; font-weight:600; color:#211f1b">{{ o.kr }}</div>
+                    <div class="mono" style="font-size:11px; color:#9a7b3f; margin-top:3px">{{ o.en }}</div>
+                  </div>
+                </div>
+                <div class="cap" style="margin-top:16px">{{ o.desc }}</div>
+
+                <div class="h-cap" style="margin-top:20px; margin-bottom:8px">Field questions (handout)</div>
+                <div style="display:flex; flex-direction:column; gap:7px">
+                  <sc-for list="{{ o.prompts }}" as="p" hint-placeholder-count="3">
+                    <div style="display:flex; gap:8px; font:400 12px/1.5 'IBM Plex Sans KR',sans-serif; color:#5d5749"><span style="color:#9a7b3f">›</span><span>{{ p }}</span></div>
+                  </sc-for>
+                </div>
+
+                <div style="margin-top:18px; border-left:3px solid #9a7b3f; padding:4px 0 4px 14px; font:400 13px/1.6 'IBM Plex Sans KR',sans-serif; color:#4a463d; font-style:italic">{{ o.reflection }}</div>
+              </div>
+
+              <div style="width:300px; flex-shrink:0">
+                <div style="background:#faf6ee; border:1px solid #efe9db; border-radius:6px; padding:18px">
+                  <div style="display:flex; justify-content:space-between; align-items:baseline">
+                    <span class="h-cap">Cohort coverage</span>
+                    <span class="serif" style="font-size:30px; font-weight:600; color:#2f5d57">{{ o.pct }}%</span>
+                  </div>
+                  <div style="background:#e9e2d2; border-radius:4px; height:10px; overflow:hidden; margin-top:8px"><div style="height:100%; width: {{ o.pct }}%; background:#2f5d57; border-radius:4px"></div></div>
+
+                  <div class="h-cap" style="margin-top:18px; margin-bottom:8px">Distribution by student</div>
+                  <div style="display:flex; align-items:flex-end; gap:3px; height:48px">
+                    <sc-for list="{{ o.dist }}" as="d" hint-placeholder-count="14">
+                      <div style="flex:1; background:#2f5d57; border-radius:2px 2px 0 0; height: {{ d.h }}%; opacity: {{ d.op }}"></div>
+                    </sc-for>
+                  </div>
+
+                  <div class="h-cap" style="margin-top:18px; margin-bottom:8px">Key sites</div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px">
+                    <sc-for list="{{ o.sites }}" as="s" hint-placeholder-count="3">
+                      <span style="font:500 10.5px 'IBM Plex Sans KR',sans-serif; background:#efe9db; color:#5d5749; padding:5px 9px; border-radius:999px">{{ s }}</span>
+                    </sc-for>
+                  </div>
+
+                  <div style="margin-top:16px; padding-top:14px; border-top:1px solid #ece5d6">
+                    <div class="mono" style="font-size:9px; letter-spacing:.08em; color:#c0392b; margin-bottom:5px">UNDEREXPLORED</div>
+                    <div style="font:400 11.5px/1.5 'IBM Plex Sans KR',sans-serif; color:#6c665a">{{ o.gap }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===================== STUDENTS GRID ===================== -->
+    <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:16px">
+        <sc-for list="{{ studentCards }}" as="s" hint-placeholder-count="14">
+          <div onClick="{{ s.onClick }}" class="card" style="padding:18px 20px; cursor:pointer" style-hover="box-shadow:0 4px 14px rgba(40,32,20,.12); border-color:#cdbfa3">
+            <div style="display:flex; align-items:center; gap:9px">
+              <span style="width:9px; height:9px; border-radius:50%; background: {{ s.cityColor }}"></span>
+              <span class="mono" style="font-size:14px; font-weight:500; color:#211f1b">{{ s.id }}</span>
+              <span style="font:500 10px 'IBM Plex Sans KR',sans-serif; color:#9a7b3f; margin-left:auto; background:#faf3e6; padding:3px 8px; border-radius:999px">{{ s.tag }}</span>
+            </div>
+            <div style="display:flex; gap:16px; margin-top:16px">
+              <div><div class="serif" style="font-size:20px; font-weight:600">{{ s.mem }}</div><div class="mono" style="font-size:8.5px; color:#9a948a; margin-top:2px">Memos</div></div>
+              <div><div class="serif" style="font-size:20px; font-weight:600">{{ s.depth }}</div><div class="mono" style="font-size:8.5px; color:#9a948a; margin-top:2px">Avg. depth</div></div>
+              <div><div class="serif" style="font-size:20px; font-weight:600; color:#2f5d57">{{ s.obj }}%</div><div class="mono" style="font-size:8.5px; color:#9a948a; margin-top:2px">Objective coverage</div></div>
+            </div>
+            <div style="margin-top:14px; background:#f1ece0; border-radius:3px; height:7px; overflow:hidden"><div style="height:100%; width: {{ s.memPct }}%; background:#6e3a36; border-radius:3px"></div></div>
+            <div style="font:400 10.5px 'IBM Plex Mono',monospace; color:#9a948a; margin-top:8px">Centered on {{ s.topCity }} · {{ s.photo }} photos</div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ===================== STUDENT DETAIL ===================== -->
+    <sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px">
+          <div onClick="{{ backToGrid }}" style="cursor:pointer; font:500 12px 'IBM Plex Sans KR',sans-serif; color:#6c665a; display:flex; align-items:center; gap:6px">‹ All students</div>
+          <div style="margin-left:auto; display:flex; gap:8px">
+            <div onClick="{{ prevStudent }}" style="cursor:pointer; width:32px; height:32px; border-radius:6px; border:1px solid #e0d8c6; display:flex; align-items:center; justify-content:center; color:#6c665a">‹</div>
+            <div onClick="{{ nextStudent }}" style="cursor:pointer; width:32px; height:32px; border-radius:6px; border:1px solid #e0d8c6; display:flex; align-items:center; justify-content:center; color:#6c665a">›</div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:26px 30px; margin-bottom:22px; display:flex; gap:26px; flex-wrap:wrap; align-items:center">
+          <div style="display:flex; align-items:center; gap:14px">
+            <div style="width:54px; height:54px; border-radius:50%; background: {{ cur.cityColor }}; display:flex; align-items:center; justify-content:center; color:#fff; font:600 16px 'IBM Plex Mono',monospace">{{ cur.initials }}</div>
+            <div>
+              <div class="serif" style="font-size:26px; font-weight:600">{{ cur.id }}</div>
+              <div style="font:500 12px 'IBM Plex Sans KR',sans-serif; color:#9a7b3f; margin-top:2px">{{ cur.tag }}</div>
+            </div>
+          </div>
+          <div style="display:flex; gap:26px; margin-left:auto; flex-wrap:wrap">
+            <sc-for list="{{ cur.stats }}" as="st" hint-placeholder-count="5">
+              <div><div class="serif" style="font-size:23px; font-weight:600">{{ st.v }}</div><div class="mono" style="font-size:9px; color:#9a948a; margin-top:3px">{{ st.l }}</div></div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px">
+          <sc-for list="{{ cur.compare }}" as="c" hint-placeholder-count="4">
+            <div class="card" style="padding:16px 18px">
+              <div class="mono" style="font-size:9.5px; color:#9a948a; text-transform:uppercase; letter-spacing:.04em">{{ c.label }}</div>
+              <div style="display:flex; align-items:baseline; gap:8px; margin-top:7px">
+                <span class="serif" style="font-size:22px; font-weight:600">{{ c.val }}</span>
+                <span style="font:500 11px 'IBM Plex Mono',monospace; color: {{ c.color }}">{{ c.delta }}</span>
+              </div>
+              <div style="font:400 10px 'IBM Plex Sans KR',sans-serif; color:#9a948a; margin-top:3px">vs. cohort</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div class="card" style="padding:28px 30px; margin-bottom:22px">
+          <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:4px">
+            <span class="h-cap">Learning profile — meta-analysis</span>
+            <span style="font:600 11px 'IBM Plex Sans KR',sans-serif; color:#fff; background:#6e3a36; padding:4px 11px; border-radius:999px">{{ curMeta.signature }}</span>
+            <span style="font:400 11px 'IBM Plex Sans KR',sans-serif; color:#9a948a">{{ curMeta.sigDesc }}</span>
+          </div>
+          <div style="font:400 14px/1.75 'IBM Plex Sans KR',sans-serif; color:#3f3b33; margin-top:10px; max-width:800px">{{ curMeta.narrative }}</div>
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:20px; background:#ece6d8; border:1px solid #ece6d8; border-radius:6px; overflow:hidden">
+            <sc-for list="{{ curMeta.ranks }}" as="r" hint-placeholder-count="4">
+              <div style="background:#fffdf8; padding:13px 16px">
+                <div class="serif" style="font-size:19px; font-weight:600; color:#211f1b">{{ r.v }}</div>
+                <div class="mono" style="font-size:9px; color:#9a948a; margin-top:5px; letter-spacing:.04em">{{ r.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px">
+            <div>
+              <div class="h-cap" style="margin-bottom:12px">Recurring observation themes</div>
+              <sc-for list="{{ curMeta.themes }}" as="t" hint-placeholder-count="4">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex; justify-content:space-between; font:500 12px 'IBM Plex Sans KR',sans-serif; color:#211f1b; margin-bottom:4px"><span>{{ t.n }}</span><span class="mono" style="color:#9a948a">{{ t.pct }}%</span></div>
+                  <div style="background:#f1ece0; border-radius:4px; height:10px; overflow:hidden"><div style="height:100%; width: {{ t.w }}%; background:#6e3a36; border-radius:4px"></div></div>
+                </div>
+              </sc-for>
+              <div class="h-cap" style="margin-top:18px; margin-bottom:10px">Keywords</div>
+              <div style="display:flex; flex-wrap:wrap; gap:7px">
+                <sc-for list="{{ curMeta.keywords }}" as="k" hint-placeholder-count="6">
+                  <span style="font:500 11px 'IBM Plex Sans KR',sans-serif; background:#efe9db; color:#5d5749; padding:5px 11px; border-radius:999px">{{ k }}</span>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div class="h-cap" style="margin-bottom:12px">Distribution of stances</div>
+              <sc-for list="{{ curMeta.stance }}" as="s" hint-placeholder-count="3">
+                <div style="margin-bottom:11px">
+                  <div style="display:flex; justify-content:space-between; font:500 12px 'IBM Plex Sans KR',sans-serif; color:#57534a; margin-bottom:4px"><span>{{ s.n }}</span><span class="mono" style="color:#9a948a">{{ s.pct }}%</span></div>
+                  <div style="background:#f1ece0; border-radius:4px; height:10px; overflow:hidden"><div style="height:100%; width: {{ s.pct }}%; background: {{ s.color }}; border-radius:4px"></div></div>
+                </div>
+              </sc-for>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px">
+                <div style="background:#f3f7f5; border-radius:7px; padding:13px 14px">
+                  <div class="mono" style="font-size:8.5px; letter-spacing:.06em; color:#2f5d57; margin-bottom:5px">STRONGEST</div>
+                  <div style="font:600 12px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ curMeta.strongObj }}</div>
+                  <div class="serif" style="font-size:18px; font-weight:600; color:#2f5d57; margin-top:3px">{{ curMeta.strongPct }}</div>
+                </div>
+                <div style="background:#fbf2f0; border-radius:7px; padding:13px 14px">
+                  <div class="mono" style="font-size:8.5px; letter-spacing:.06em; color:#c0392b; margin-bottom:5px">WEAKEST</div>
+                  <div style="font:600 12px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ curMeta.weakObj }}</div>
+                  <div class="serif" style="font-size:18px; font-weight:600; color:#c0392b; margin-top:3px">{{ curMeta.weakPct }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:24px; padding-top:22px; border-top:1px solid #f0ebdf">
+            <div>
+              <div class="h-cap" style="color:#2f5d57; margin-bottom:12px">Distinctive strengths</div>
+              <div style="display:flex; flex-direction:column; gap:12px">
+                <sc-for list="{{ curMeta.strengths }}" as="x" hint-placeholder-count="2">
+                  <div style="display:flex; gap:10px"><span style="color:#2f5d57; font-size:13px; line-height:1.4">▲</span><div><div style="font:600 12.5px 'IBM Plex Sans KR',sans-serif; color:#211f1b">{{ x.t }}</div><div style="font:400 11.5px/1.5 'IBM Plex Sans KR',sans-serif; color:#6c665a; margin-top:2px">{{ x.d }}</div></div></div>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div class="h-cap" style="color:#c0392b; margin-bottom:12px">Growth points</div>
+              <div style="display:flex; flex-direction:column; gap:12px">
+                <sc-for list="{{ curMeta.growth }}" as="x" hint-placeholder-count="2">
+                  <div style="display:flex; gap:10px"><span style="color:#c0392b; font-size:13px; line-height:1.4">▼</span><div><div style="font:600 12.5px 'IBM Plex Sans KR',sans-serif; color:#211b1b">{{ x.t }}</div><div style="font:400 11.5px/1.5 'IBM Plex Sans KR',sans-serif; color:#6c665a; margin-top:2px">{{ x.d }}</div></div></div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:24px 26px">
+            <div class="h-cap" style="margin-bottom:6px">Learning objective coverage</div>
+            <div style="display:flex; justify-content:center">{{ dRadar }}</div>
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="h-cap" style="margin-bottom:6px">Engagement vs frequency · bubble = photos</div>
+            {{ dScatter }}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.1fr 1fr; gap:22px; margin-bottom:22px">
+          <div class="card" style="padding:24px 26px">
+            <div class="h-cap" style="margin-bottom:8px">Daily rhythm</div>
+            {{ dRhythm }}
+            <div style="height:1px; background:#f0ebdf; margin:18px 0"></div>
+            <div class="h-cap" style="margin-bottom:10px">The language of thought by place type</div>
+            <sc-for list="{{ cur.langBars }}" as="r" hint-placeholder-count="5">
+              <div style="margin-bottom:9px">
+                <div style="display:flex; justify-content:space-between; font:500 10.5px 'IBM Plex Sans KR',sans-serif; color:#57534a; margin-bottom:3px"><span>{{ r.t }}</span><span class="mono" style="color:#9a948a">{{ r.notes }}</span></div>
+                <div style="display:flex; height:12px; border-radius:2px; overflow:hidden; background:#f1ece0">
+                  <div style="width: {{ r.kr }}%; background:#6e3a36"></div>
+                  <div style="width: {{ r.en }}%; background:#c7b29a"></div>
+                  <div style="width: {{ r.other }}%; background:#e2d8c6"></div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div class="card" style="padding:24px 26px">
+            <div class="h-cap" style="margin-bottom:8px">Topic composition</div>
+            <div style="display:flex; align-items:center; gap:16px">
+              {{ dTopicDonut }}
+              <div style="display:flex; flex-direction:column; gap:7px">
+                <sc-for list="{{ cur.topics }}" as="t" hint-placeholder-count="6">
+                  <div style="display:flex; align-items:center; gap:7px; font:400 11px 'IBM Plex Sans KR',sans-serif; color:#57534a"><span style="width:10px; height:10px; border-radius:3px; background: {{ t.color }}"></span>{{ t.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="height:1px; background:#f0ebdf; margin:18px 0"></div>
+            <div class="h-cap" style="margin-bottom:6px">Engagement by site</div>
+            {{ dAnchorBars }}
+          </div>
+        </div>
+
+        <div class="card" style="padding:24px 28px">
+          <div class="h-cap" style="margin-bottom:14px">Longest reflections</div>
+          <div style="display:flex; flex-direction:column; gap:14px">
+            <sc-for list="{{ cur.refs }}" as="l" hint-placeholder-count="3">
+              <div style="display:flex; gap:16px; align-items:flex-start">
+                <div style="width:90px; flex-shrink:0">
+                  <div style="display:flex; align-items:center; gap:6px"><span style="width:7px; height:7px; border-radius:50%; background: {{ l.cityColor }}"></span><span class="mono" style="font-size:10px; color:#9a948a">{{ l.len }} chars</span></div>
+                  <div class="serif" style="font-size:12.5px; font-weight:600; margin-top:5px; line-height:1.3">{{ l.site }}</div>
+                </div>
+                <div style="flex:1; border-left:2px solid #ece5d6; padding-left:16px; font:400 13px/1.65 'IBM Plex Sans KR',sans-serif; color:#4a463d">{{ l.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ===================== METHODOLOGY (document tab) ===================== -->
+    <sc-if value="{{ isMethod }}" hint-placeholder-val="{{ false }}">
+      <div style="max-width:880px">
+        <sc-for list="{{ method }}" as="m" hint-placeholder-count="7">
+          <div class="card" style="padding:30px 34px; margin-bottom:20px">
+            <div style="display:flex; align-items:baseline; gap:14px; margin-bottom:4px">
+              <span class="serif" style="font-size:32px; font-weight:600; color:#e0d5bf; line-height:1">{{ m.num }}</span>
+              <div>
+                <div class="serif" style="font-size:23px; font-weight:600; color:#211f1b; letter-spacing:-.01em">{{ m.title }}</div>
+                <div class="mono" style="font-size:10.5px; color:#9a7b3f; margin-top:3px; letter-spacing:.04em">{{ m.en }}</div>
+              </div>
+            </div>
+            <sc-for list="{{ m.blocks }}" as="b" hint-placeholder-count="3">
+              <div style="margin-top:18px">
+                <div class="h-cap" style="margin-bottom:6px">{{ b.h }}</div>
+                <div style="font:400 13.5px/1.78 'IBM Plex Sans KR','IBM Plex Sans',sans-serif; color:#3f3b33">{{ b.body }}</div>
+                <sc-if value="{{ b.diag }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:10px; background:#211f1b; border-radius:8px; padding:13px 16px; font:400 11.5px/1.7 'IBM Plex Mono',monospace; color:#cabfae; white-space:pre-wrap">{{ b.diag }}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+        <div class="mono" style="font-size:10.5px; color:#9a948a; margin-top:4px">FieldAtlas export 2026-04-10 · n=750 memos · 24 students · 108 places · The Seen and The Unseen, GET USA.</div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+
+<!-- swarm tooltip -->
+<sc-if value="{{ hover }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; pointer-events:none; z-index:80; left: {{ hoverMx }}px; top: {{ hoverMy }}px; transform:translate(14px,12px); background:#211f1b; color:#f4efe4; border-radius:7px; padding:10px 13px; box-shadow:0 8px 24px rgba(0,0,0,.28); max-width:220px">
+    <div class="serif" style="font-size:13.5px; font-weight:600; line-height:1.25">{{ hover.name }}</div>
+    <div class="mono" style="font-size:9.5px; color:#a39a8a; margin-top:3px">{{ hover.city }} · {{ hover.topic }}</div>
+    <div style="display:flex; gap:14px; margin-top:8px">
+      <span class="mono" style="font-size:11px"><b style="color:#fbf8f1">{{ hover.mem }}</b> <span style="color:#a39a8a">memo</span></span>
+      <span class="mono" style="font-size:11px"><b style="color:#fbf8f1">{{ hover.photo }}</b> <span style="color:#a39a8a">photo</span></span>
+      <span class="mono" style="font-size:11px"><b style="color:#fbf8f1">{{ hover.depth }}</b> <span style="color:#a39a8a">chars</span></span>
+    </div>
+  </div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { view:'cohort', student:null, place:null, colorBy:'place', sizeBy:'mem', hover:null, hoverMx:0, hoverMy:0 };
+
+  cityColors = { 'New York':'#2f5d57', 'Philadelphia':'#9a7b3f', 'Washington DC':'#6e3a36', 'Unknown':'#b3aa9b' };
+  topicColors = { 'Museum':'#6e3a36', 'Street':'#2f5d57', 'Park':'#9a7b3f', 'Historic':'#3f4a63', 'Memorial':'#a3563f', 'Other':'#a39a8c' };
+  topicKR = { 'Museum':'Museum & Gallery', 'Street':'Street & Everyday', 'Park':'Park & Plaza', 'Historic':'Historic Site', 'Memorial':'Memorial', 'Other':'Other' };
+  typeKorean = { 'Museum':0.71, 'Park':0.55, 'Street':0.51, 'Historic':0.35, 'Memorial':0.18, 'Other':0.50 };
+
+  objMeta = [
+    {key:'space', num:'01', kr:'The Logic of Space', en:'Space as Argument',
+     desc:'The handout asserts that "space is not neutral." Architecture, design, lighting, and modes of classification themselves impose on the visitor a framework for understanding the past. At The Met Cloisters and The Met Great Hall, students used photographs and notes to trace "what response — reverence, nostalgia, escape, authority — does this space demand."',
+     prompts:['What does this building say without any labels?','Why "reconstruct" medieval Europe in Manhattan?','What does the circulation route make you see first, and what last?'],
+     sites:['The Met Cloisters','The Met · Great Hall','Library of Congress'],
+     gap:'Rarely articulated in street and everyday spaces — there is a tendency to recognize only "designed space" as an object of analysis.'},
+    {key:'objects', num:'02', kr:'Objects and Classification', en:'Objects & Classification',
+     desc:'How does the museum divide and name the world? The same artifact may become "art," "civilization," or "relic" depending on where it is placed. Comparing The Met\'s Egyptian galleries, its Arab/Iranian/South Asian galleries, and its European paintings, students read classification as a grammar of power.',
+     prompts:['Why is this artifact in exactly this place?','Does it present neighboring cultures as connected or as separate?','Would its meaning change if it were placed in a contemporary gallery?'],
+     sites:['The Met · World Galleries','Benjamin Franklin Museum','MoMA'],
+     gap:'Critiques of classification concentrate on The Met — there is ample room to extend them to other museums through labeling and arrangement.'},
+    {key:'memory', num:'03', kr:'Public Memory & Ritual', en:'Public Memory & Ritual',
+     desc:'How does Independence Hall turn a founding that was a riot into a "stable origin myth" and a ritual? What do monuments make us remember, and what do they make us forget? The students\' longest and most contemplative notes emerged from this theme.',
+     prompts:['What emotion — reverence, pride, solemnity, civic duty — does this place demand?','What does it mean for a space of political assembly to become a sanctuary?','Does it depict the founding as chaotic, or as inevitable?'],
+     sites:['Independence Hall','National Mall','Lincoln · Jefferson Memorial'],
+     gap:'Turning attention to "the omissions of memory" connects more strongly with objective 04.'},
+    {key:'unseen', num:'04', kr:'The Seen and the Unseen', en:'The Seen / The Unseen',
+     desc:'The central proposition of the entire course. Look not only at what is staged and visible — greatness, authority, progress — but at what is concealed, softened, and excluded. At the Holocaust Museum and the National Museum of African American History, students captured the moments when "not showing" itself becomes a witness.',
+     prompts:['What does this exhibition soften or leave out?','Who is the subject of the story, and who is its object?','Is the discomfort designed, or incidental?'],
+     sites:['US Holocaust Memorial','Nat. Museum of African American History','Museum of the American Indian'],
+     gap:'The most difficult critical objective. A deliberate extension toward "what is invisible" in streets and everyday life is needed.'},
+    {key:'authority', num:'05', kr:'Authority & Cultural Power', en:'Authority & Cultural Power',
+     desc:'The museum and the Capitol are each an argument about civilization, art, and legitimacy. How do scale and style produce authority? At the dome of the U.S. Capitol and The Met\'s world map, students asked "whose authority is this?"',
+     prompts:['Does this space address its visitors as deferential, as elite, or as protected?','How do scale and ornamentation change the experience?','From whom, and toward whom, does authority operate?'],
+     sites:['US Capitol','The Met','White House'],
+     gap:'Focused on state authority — broadening the view to "soft power" such as art and media would deepen the analysis.'},
+  ];
+
+  placeContent = {
+    aahm:{converge:'High · 86%',
+      synth:'Almost without exception, students read "circulation = narrative." The observation recurs that the structure — rising from the basement floor of slavery up toward emancipation and culture — creates a clock of memory, and the cohort\'s longest and weightiest reflections emerged here.',
+      meta:'Most of the heavy recorders (the top-recording students) converge on the same frame, "circulation = narrative." Agreement among observations is very high, and divergence arises mainly over "is the design of emotion manipulation, or the visitor\'s projection?" The share of critical perspectives far exceeds the cohort average.',
+      themes:[{n:'Circulation = Narrative',pct:86},{n:'A Clock of Arrangement',pct:64},{n:'Silence · the Empty',pct:41},{n:'The Design of Emotion',pct:38}],
+      stance:[{n:'Critical',pct:58,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:30,color:'#2f5d57'},{n:'Descriptive',pct:12,color:'#9a7b3f'}],
+      keywords:['Circulation','Clock','Basement/Upper Floor','Silence','Concealed Path','Ethics'],
+      photos:[{note:'The ramp rising from basement to upper floor — a forced route',id:'S-02',theme:'Circulation = Narrative'},{note:'A dark passage with a low ceiling',id:'S-07',theme:'Silence · the Empty'},{note:'A fragment placed without a label',id:'S-11',theme:'Arrangement'}],
+      notes:[{id:'S-02',len:268,lang:'KR',theme:'Ethics',text:'A design that places the most painful history in the basement and lifts emancipation toward the light. What is placed where was itself an ethics.'},{id:'S-11',len:241,lang:'KR',theme:'Circulation',text:'The visitor\'s body is lifted from below to above. The forced path shapes the curve of emotion.'},{id:'S-07',len:255,lang:'KR',theme:'Silence',text:'The vast silence speaks the loudest. The emptied space becomes a form of mourning.'},{id:'S-05',len:132,lang:'EN',theme:'Arrangement',text:'The sequencing is the argument — you are not allowed to skip the pain.'},{id:'S-03',len:88,lang:'KR',theme:'Scale',text:'An overwhelming quantity. The guilt of leaving without having seen it all.'}]},
+    clo:{converge:'High · 79%',
+      synth:'To the handout\'s question — "is this a museum of the Middle Ages, or an American museum imagining the Middle Ages?" — most answered the latter. Through photographs they demonstrated that architecture, light, and garden speak more powerfully than the labels.',
+      meta:'Strong convergence on the reading of "space as stage." Photographic records are very abundant (the most in the cohort), so the tendency to support an argument with visual evidence stands out. Divergence is a difference in stance: "should this staging be critiqued, or enjoyed?"',
+      themes:[{n:'Space as Stage',pct:79},{n:'The Staging of Light and Garden',pct:62},{n:'Authenticity vs. Reproduction',pct:47},{n:'A Middle Ages Imagined by America',pct:44}],
+      stance:[{n:'Critical',pct:46,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:40,color:'#2f5d57'},{n:'Descriptive',pct:14,color:'#9a7b3f'}],
+      keywords:['Cloister','Light','Garden','Reproduction','Stage','Unicorn'],
+      photos:[{note:'Side light falling into the cloister',id:'S-05',theme:'The Staging of Light'},{note:'Silence at the center of the garden',id:'S-01',theme:'Stage'},{note:'The seams of reassembled stonework',id:'S-08',theme:'Reproduction'}],
+      notes:[{id:'S-05',len:240,lang:'KR',theme:'Staging',text:'It persuades you of the past not through artifacts but through atmosphere. The stillness of the cloister was itself the staging.'},{id:'S-01',len:176,lang:'KR',theme:'Reproduction',text:'The Middle Ages in the heart of Manhattan — a stage more "medieval" than the real thing.'},{id:'S-08',len:120,lang:'EN',theme:'Unicorn',text:'Lighting does the curating here; the labels are almost an afterthought.'},{id:'S-11',len:98,lang:'KR',theme:'Authenticity',text:'You begin to ask where the original ends and the staging begins.'}]},
+    ind:{converge:'Medium · 70%',
+      synth:'Students noted how a political process that had been a riot is sutured into a seamless origin myth. Many notes applied the handout frame "a space of political assembly becomes a sanctuary" directly.',
+      meta:'Convergence on the "sanctification" frame, but with large divergence in the intensity of critique. Some remain in reverence, others focus on exclusion (whose independence?). Most of Philadelphia\'s records concentrate on this single site.',
+      themes:[{n:'The Sanctification of the Founding',pct:70},{n:'The Assembly Hall Turned Sanctuary',pct:55},{n:'Excluded Voices',pct:38},{n:'Inevitable vs. Contingent',pct:33}],
+      stance:[{n:'Critical',pct:44,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:38,color:'#2f5d57'},{n:'Descriptive',pct:18,color:'#9a7b3f'}],
+      keywords:['Founding','Ritual','Sanctuary','Assembly','Exclusion','Inevitability'],
+      photos:[{note:'The empty assembly seats',id:'S-07',theme:'Sanctuary'},{note:'A panel reenacting the signing scene',id:'S-12',theme:'Sanctification'}],
+      notes:[{id:'S-07',len:165,lang:'KR',theme:'Authority',text:'In the empty chairs, the authority of consensus had congealed. The guide speaks not of division but of inevitability.'},{id:'S-12',len:140,lang:'KR',theme:'Exclusion',text:'An exhibition that never, in the end, asks whose independence it was.'},{id:'S-04',len:72,lang:'EN',theme:'Ritual',text:'You are meant to feel reverence before you think.'}]},
+    hol:{converge:'High · 81%',
+      synth:'The insight that "not showing is itself testimony" appears intensively. This is the site where objective 04 (The Seen and the Unseen) was articulated most strongly.',
+      meta:'Strong convergence on "the narrative of the empty space / of omission." Photographs are few but the notes are deep — traces of restraining the camera and simply gazing. Critical and empathetic stances are nearly in balance.',
+      themes:[{n:'The Narrative of the Empty',pct:81},{n:'Numbers → People',pct:58},{n:'Designed Discomfort',pct:49},{n:'The Ethics of Witness',pct:40}],
+      stance:[{n:'Empathetic · Immersive',pct:48,color:'#2f5d57'},{n:'Critical',pct:40,color:'#6e3a36'},{n:'Descriptive',pct:12,color:'#9a7b3f'}],
+      keywords:['The Empty','Pile of Shoes','Discomfort','Witness','Silence','Omission'],
+      photos:[{note:'A pile of shoes on the floor',id:'S-12',theme:'Numbers → People'},{note:'A narrow, dark passage',id:'S-02',theme:'Designed Discomfort'}],
+      notes:[{id:'S-12',len:212,lang:'KR',theme:'The Empty',text:'Before the pile of shoes, numbers turn into people. The empty space speaks.'},{id:'S-02',len:188,lang:'KR',theme:'Discomfort',text:'Designed discomfort. A will to refuse to leave the visitor at ease.'},{id:'S-07',len:96,lang:'EN',theme:'Ethics',text:'What is withheld testifies louder than what is shown.'}]},
+    cap:{converge:'Medium · 63%',
+      synth:'Objective 05 — that scale and ornament produce authority — emerges clearly. Yet the depth is slightly thinner than at the museums.',
+      meta:'Convergence on the observation "scale = authority," but the notes are short — the experience of being overwhelmed precedes analysis. The share of impressionistic records exceeds that of critique.',
+      themes:[{n:'Scale = Authority',pct:63},{n:'Citizen vs. Spectator',pct:42},{n:'The Borrowing of Style',pct:31}],
+      stance:[{n:'Descriptive',pct:42,color:'#9a7b3f'},{n:'Critical',pct:34,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:24,color:'#2f5d57'}],
+      keywords:['Dome','Scale','Symmetry','Authority','Neoclassical'],
+      photos:[{note:'The rotunda dome seen from below',id:'S-11',theme:'Scale'},{note:'A corridor along the axis of symmetry',id:'S-08',theme:'Style'}],
+      notes:[{id:'S-11',len:125,lang:'KR',theme:'Authority',text:'When you look up, the citizen becomes a spectator. The scale is the message.'},{id:'S-03',len:64,lang:'EN',theme:'Style',text:'Borrowed Roman grandeur, used to feel timeless.'}]},
+    met:{converge:'Medium · 68%',
+      synth:'The ritual quality of the Great Hall and objectives 02 and 05 — "the world map = an argument" — are observed together. Many notes ask what is art and what is civilization.',
+      meta:'Observations split into two strands, "the politics of classification" and "the ritual of entry" — not a single frame, but traces of posing a different question in each gallery. The share of critical stances is high.',
+      themes:[{n:'Classification = Argument',pct:68},{n:'The Ritual of Entry',pct:52},{n:'Art vs. Civilization',pct:45},{n:'Center and Periphery',pct:37}],
+      stance:[{n:'Critical',pct:52,color:'#6e3a36'},{n:'Descriptive',pct:26,color:'#9a7b3f'},{n:'Empathetic · Immersive',pct:22,color:'#2f5d57'}],
+      keywords:['Map','Classification','Great Hall','Clock','Egyptian Gallery','Category'],
+      photos:[{note:'The world map on the wall',id:'S-08',theme:'Classification'},{note:'The staircase of the Great Hall',id:'S-05',theme:'Ritual'}],
+      notes:[{id:'S-08',len:175,lang:'KR',theme:'Classification',text:'The way the map classifies the world was itself the museum\'s argument.'},{id:'S-05',len:130,lang:'KR',theme:'Ritual',text:'Not an entry but a ritual. Even the staircase teaches a clock.'},{id:'S-01',len:84,lang:'EN',theme:'Category',text:'Which rooms say "art" and which say "civilization"?'}]},
+    nmai:{converge:'Medium · 60%',
+      synth:'A sensitivity to "who is the speaker" stands out. The observation that first-person labels change the gaze recurs.',
+      meta:'A relatively consistent observation of "the shift of the speaker." Many notes contrast this museum with others, so the meta-comparative gaze is strong.',
+      themes:[{n:'Who Is the Speaker',pct:60},{n:'First-Person Labels',pct:48},{n:'Object → Subject',pct:36}],
+      stance:[{n:'Critical',pct:50,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:34,color:'#2f5d57'},{n:'Descriptive',pct:16,color:'#9a7b3f'}],
+      keywords:['Speaker','First Person','Subject','Contrast','Voice'],
+      photos:[{note:'An exhibition label written in the first person',id:'S-12',theme:'Speaker'}],
+      notes:[{id:'S-12',len:160,lang:'KR',theme:'Speaker',text:'An exhibition that speaks as subject, not as object. The grammatical person of the label was itself politics.'},{id:'S-09',len:70,lang:'EN',theme:'Contrast',text:'Unlike the Met, here the people speak for themselves.'}]},
+  };
+
+  h(t,p,...k){ return React.createElement(t,p,...k); }
+
+  build(){
+    if(this._built) return;
+    const R = {"students": [{"id": "S-01", "tag": "Memory & Ritual", "idx": 0, "places": [{"id": "60furmanst", "name": "60 Furman St Furman St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 6, "depth": 44, "photo": 8, "obj": null}, {"id": "92102henry", "name": "92–102 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 129, "photo": 1, "obj": null}, {"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 12, "depth": 80, "photo": 13, "obj": null}, {"id": "clarkstcla", "name": "Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 7, "depth": 23, "photo": 10, "obj": null}, {"id": "69clarkstc", "name": "69 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "depth": 6, "photo": 3, "obj": null}, {"id": "paceuniver", "name": "Pace University", "city": "New York", "topic": "Street", "day": 0, "mem": 4, "depth": 15, "photo": 4, "obj": null}, {"id": "davidhkoch", "name": "David H. Koch Theater Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 42, "photo": 2, "obj": null}, {"id": "josierober", "name": "Josie Robertson Plaza Manhattan", "city": "New York", "topic": "Park", "day": 12, "mem": 4, "depth": 78, "photo": 4, "obj": null}, {"id": "1633broadw", "name": "1633 Broadway", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "depth": 42, "photo": 5, "obj": null}, {"id": "x", "name": "Unnamed place", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "depth": 13, "photo": 5, "obj": null}, {"id": "72st", "name": "72 St Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 24, "photo": 2, "obj": null}, {"id": "96henryst", "name": "96 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "depth": 13, "photo": 5, "obj": null}, {"id": "74henryst", "name": "74 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "depth": 55, "photo": 3, "obj": null}, {"id": "new", "name": "New Museum", "city": "New York", "topic": "Museum", "day": 12, "mem": 16, "depth": 204, "photo": 18, "obj": {"objects": 0.6, "space": 0.5, "unseen": 0.4, "authority": 0.3, "memory": 0.2}}, {"id": "259elizabe", "name": "259 Elizabeth St Elizabeth St Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 8, "depth": 41, "photo": 11, "obj": null}, {"id": "pearl", "name": "17 Pearl St", "city": "New York", "topic": "Street", "day": 12, "mem": 10, "depth": 42, "photo": 11, "obj": null}, {"id": "118142orch", "name": "118–142 Orchard St", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 26, "photo": 2, "obj": null}, {"id": "9599ehoust", "name": "95–99 E Houston St", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 28, "photo": 2, "obj": null}, {"id": "55clarkstc", "name": "55 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 2, "photo": 1, "obj": null}, {"id": "12waterstw", "name": "12 Water St Water St Manhattan", "city": "New York", "topic": "Street", "day": 0, "mem": 4, "depth": 16, "photo": 8, "obj": null}, {"id": "145w21stst", "name": "145 W 21st St", "city": "New York", "topic": "Street", "day": 12, "mem": 4, "depth": 24, "photo": 4, "obj": null}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 23, "depth": 95, "photo": 28, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "mem": 12, "depth": 154, "photo": 13, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 34, "depth": 169, "photo": 35, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "museumofth", "name": "Museum of the American Revolution", "city": "Philadelphia", "topic": "Museum", "day": 1, "mem": 2, "depth": 255, "photo": 2, "obj": {"memory": 0.8}}, {"id": "330markets", "name": "330 Market St", "city": "Philadelphia", "topic": "Street", "day": 1, "mem": 5, "depth": 293, "photo": 5, "obj": null}, {"id": "8419baltim", "name": "8419 Baltimore Ave", "city": "Washington DC", "topic": "Street", "day": 2, "mem": 1, "depth": 6, "photo": 1, "obj": null}, {"id": "scotus", "name": "Supreme Court of the US", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 4, "depth": 153, "photo": 4, "obj": {"authority": 0.8}}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 11, "depth": 124, "photo": 11, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 4, "depth": 82, "photo": 5, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}}, {"id": "jeff", "name": "Thomas Jefferson Memorial", "city": "Washington DC", "topic": "Memorial", "day": 3, "mem": 8, "depth": 20, "photo": 9, "obj": {"memory": 0.85, "authority": 0.7, "space": 0.6, "unseen": 0.55, "objects": 0.1}}, {"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 26, "depth": 170, "photo": 29, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}, {"id": "capitalgal", "name": "Capital Gallery", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 4, "depth": 16, "photo": 5, "obj": {"objects": 0.8}}, {"id": "mall", "name": "National Mall & Memorial Parks", "city": "Washington DC", "topic": "Memorial", "day": 4, "mem": 18, "depth": 23, "photo": 24, "obj": {"memory": 0.9, "authority": 0.6, "unseen": 0.6, "space": 0.6, "objects": 0.1}}, {"id": "hol", "name": "US Holocaust Memorial Museum", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 25, "depth": 94, "photo": 34, "obj": {"unseen": 0.95, "memory": 0.9, "space": 0.7, "objects": 0.5, "authority": 0.4}}, {"id": "386elmwood", "name": "386 Elmwood Dr", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 34, "photo": 2, "obj": null}], "mem": 285, "photo": 329, "depthAvg": 100, "cov": {"space": 12, "objects": 17, "memory": 33, "unseen": 29, "authority": 8}, "objAvg": 66, "krPct": 45, "topCity": "New York", "rhythm": [3, 6, 0, 2, 0, 0, 0, 0, 3, 12, 27, 77, 50, 33, 33, 34, 27, 25, 27, 17, 14, 11, 1, 2]}, {"id": "S-02", "tag": "Classification Critic", "idx": 1, "places": [{"id": "73clarkst", "name": "73 Clark St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 15, "photo": 1, "obj": null}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 22, "depth": 33, "photo": 33, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "mem": 4, "depth": 10, "photo": 4, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 8, "depth": 72, "photo": 19, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "27sfourths", "name": "27 S Fourth St", "city": "Philadelphia", "topic": "Street", "day": 1, "mem": 3, "depth": 16, "photo": 3, "obj": null}, {"id": "bfm", "name": "Benjamin Franklin Museum", "city": "Philadelphia", "topic": "Museum", "day": 1, "mem": 10, "depth": 64, "photo": 19, "obj": {"objects": 0.6, "authority": 0.5, "memory": 0.4, "space": 0.4, "unseen": 0.3}}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 11, "depth": 51, "photo": 17, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}}, {"id": "nationalai", "name": "National Air and Space Museum", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 2, "depth": 47, "photo": 3, "obj": {"authority": 0.8}}, {"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 15, "depth": 29, "photo": 23, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}, {"id": "natgal", "name": "National Gallery of Art", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 9, "depth": 17, "photo": 13, "obj": {"objects": 0.7, "space": 0.6, "authority": 0.6, "unseen": 0.4, "memory": 0.3}}, {"id": "moma", "name": "Museum of Modern Art (MoMA)", "city": "New York", "topic": "Museum", "day": 12, "mem": 23, "depth": 44, "photo": 52, "obj": {"objects": 0.7, "space": 0.5, "authority": 0.4, "unseen": 0.3, "memory": 0.2}}], "mem": 108, "photo": 187, "depthAvg": 40, "cov": {"space": 21, "objects": 35, "memory": 8, "unseen": 35, "authority": 2}, "objAvg": 96, "krPct": 95, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 30, 10, 3, 0, 28, 2, 0, 11, 12, 0, 1, 0, 0]}, {"id": "S-03", "tag": "Unseen-focused", "idx": 2, "places": [{"id": "92102henry", "name": "92–102 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 0, "photo": 1, "obj": null}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 12, "depth": 221, "photo": 12, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "mem": 4, "depth": 6, "photo": 4, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 3, "depth": 266, "photo": 3, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "8419baltim", "name": "8419 Baltimore Ave", "city": "Washington DC", "topic": "Street", "day": 2, "mem": 1, "depth": 48, "photo": 1, "obj": null}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 2, "depth": 277, "photo": 2, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 1, "depth": 365, "photo": 1, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}}, {"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 18, "depth": 136, "photo": 25, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}], "mem": 42, "photo": 49, "depthAvg": 164, "cov": {"space": 30, "objects": 10, "memory": 8, "unseen": 48, "authority": 5}, "objAvg": 95, "krPct": 29, "topCity": "Washington DC", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 6, 13, 17, 6, 0, 2, 4, 1, 0, 0, 0, 0, 1, 0]}, {"id": "S-04", "tag": "Space Analyst", "idx": 3, "places": [{"id": "newyorksta", "name": "New York State Thruway S New York", "city": "New York", "topic": "Other", "day": 12, "mem": 2, "depth": 50, "photo": 2, "obj": null}, {"id": "10beekmans", "name": "10 Beekman St", "city": "New York", "topic": "Street", "day": 0, "mem": 3, "depth": 36, "photo": 3, "obj": null}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 12, "depth": 40, "photo": 13, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 5, "depth": 98, "photo": 5, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 3, "depth": 201, "photo": 8, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}], "mem": 25, "photo": 31, "depthAvg": 71, "cov": {"space": 60, "objects": 0, "memory": 25, "unseen": 0, "authority": 15}, "objAvg": 80, "krPct": 29, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 14, 3, 0, 1, 0, 0, 0, 1, 2, 0, 0, 2, 5]}, {"id": "S-05", "tag": "Memory & Ritual", "idx": 4, "places": [{"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 14, "depth": 2, "photo": 16, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 2, "depth": 0, "photo": 2, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}, {"id": "jeff", "name": "Thomas Jefferson Memorial", "city": "Washington DC", "topic": "Memorial", "day": 3, "mem": 1, "depth": 0, "photo": 1, "obj": {"memory": 0.85, "authority": 0.7, "space": 0.6, "unseen": 0.55, "objects": 0.1}}, {"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 3, "depth": 0, "photo": 3, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}, {"id": "mall", "name": "National Mall & Memorial Parks", "city": "Washington DC", "topic": "Memorial", "day": 4, "mem": 4, "depth": 257, "photo": 4, "obj": {"memory": 0.9, "authority": 0.6, "unseen": 0.6, "space": 0.6, "objects": 0.1}}], "mem": 24, "photo": 26, "depthAvg": 44, "cov": {"space": 0, "objects": 0, "memory": 79, "unseen": 12, "authority": 8}, "objAvg": 100, "krPct": 0, "topCity": "Philadelphia", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 9, 11, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0]}, {"id": "S-06", "tag": "Space Analyst", "idx": 5, "places": [{"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 9, "depth": 11, "photo": 21, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "mem": 2, "depth": 0, "photo": 2, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 2, "depth": 64, "photo": 3, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 3, "depth": 2, "photo": 3, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 5, "depth": 5, "photo": 5, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}}], "mem": 21, "photo": 34, "depthAvg": 12, "cov": {"space": 43, "objects": 10, "memory": 10, "unseen": 24, "authority": 14}, "objAvg": 100, "krPct": 91, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8, 4, 0, 0, 3, 4, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-07", "tag": "Unseen-focused", "idx": 6, "places": [{"id": "scotus", "name": "Supreme Court of the US", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 1, "depth": 13, "photo": 1, "obj": {"authority": 0.8}}, {"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 18, "depth": 37, "photo": 23, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}], "mem": 19, "photo": 24, "depthAvg": 36, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 95, "authority": 5}, "objAvg": 100, "krPct": 78, "topCity": "Washington DC", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-08", "tag": "Everyday Logger", "idx": 7, "places": [{"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 11, "depth": 17, "photo": 12, "obj": null}, {"id": "55clarkstc", "name": "55 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 4, "depth": 10, "photo": 4, "obj": null}], "mem": 15, "photo": 16, "depthAvg": 15, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 44, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 2, 2, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-10", "tag": "Power Gazer", "idx": 9, "places": [{"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "depth": 17, "photo": 3, "obj": null}, {"id": "73clarkst", "name": "73 Clark St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 10, "photo": 1, "obj": null}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 4, "depth": 85, "photo": 5, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}], "mem": 8, "photo": 9, "depthAvg": 50, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 100}, "objAvg": 50, "krPct": 100, "topCity": "New York", "rhythm": [3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]}, {"id": "S-12", "tag": "Everyday Logger", "idx": 11, "places": [{"id": "x", "name": "Unnamed place", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 116, "photo": 5, "obj": null}], "mem": 2, "photo": 5, "depthAvg": 116, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 98, "topCity": "New York", "rhythm": [0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-13", "tag": "Everyday Logger", "idx": 12, "places": [{"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 170, "photo": 1, "obj": null}], "mem": 1, "photo": 1, "depthAvg": 170, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 20, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-14", "tag": "Everyday Logger", "idx": 13, "places": [{"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "depth": 10, "photo": 2, "obj": null}], "mem": 2, "photo": 2, "depthAvg": 10, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 33, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0]}, {"id": "S-17", "tag": "Power Gazer", "idx": 16, "places": [{"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 5, "depth": 24, "photo": 5, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}], "mem": 5, "photo": 5, "depthAvg": 24, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 100}, "objAvg": 100, "krPct": 0, "topCity": "Washington DC", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-18", "tag": "Everyday Logger", "idx": 17, "places": [{"id": "218frontst", "name": "218 Front St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "depth": 6, "photo": 4, "obj": null}], "mem": 3, "photo": 4, "depthAvg": 6, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 100, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-23", "tag": "Everyday Logger", "idx": 22, "places": [{"id": "118142orch", "name": "118–142 Orchard St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 27, "photo": 1, "obj": null}], "mem": 1, "photo": 1, "depthAvg": 27, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 0, "topCity": "New York", "rhythm": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]}, {"id": "S-24", "tag": "Everyday Logger", "idx": 23, "places": [{"id": "73clarkst", "name": "73 Clark St", "city": "New York", "topic": "Street", "day": 12, "mem": 1, "depth": 12, "photo": 1, "obj": null}], "mem": 1, "photo": 1, "depthAvg": 12, "cov": {"space": 0, "objects": 0, "memory": 0, "unseen": 0, "authority": 0}, "objAvg": 0, "krPct": 100, "topCity": "New York", "rhythm": [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]}], "cohortPlaces": [{"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}, "mem": 80, "photo": 103, "depth": 100}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}, "mem": 78, "photo": 107, "depth": 79}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}, "mem": 66, "photo": 81, "depth": 118}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}, "mem": 30, "photo": 36, "depth": 100}, {"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 29, "photo": 31, "depth": 48}, {"id": "hol", "name": "US Holocaust Memorial Museum", "city": "Washington DC", "topic": "Museum", "day": 4, "obj": {"unseen": 0.95, "memory": 0.9, "space": 0.7, "objects": 0.5, "authority": 0.4}, "mem": 25, "photo": 34, "depth": 94}, {"id": "moma", "name": "Museum of Modern Art (MoMA)", "city": "New York", "topic": "Museum", "day": 12, "obj": {"objects": 0.7, "space": 0.5, "authority": 0.4, "unseen": 0.3, "memory": 0.2}, "mem": 23, "photo": 52, "depth": 44}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}, "mem": 22, "photo": 23, "depth": 87}, {"id": "mall", "name": "National Mall & Memorial Parks", "city": "Washington DC", "topic": "Memorial", "day": 4, "obj": {"memory": 0.9, "authority": 0.6, "unseen": 0.6, "space": 0.6, "objects": 0.1}, "mem": 22, "photo": 28, "depth": 66}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}, "mem": 21, "photo": 28, "depth": 61}, {"id": "new", "name": "New Museum", "city": "New York", "topic": "Museum", "day": 12, "obj": {"objects": 0.6, "space": 0.5, "unseen": 0.4, "authority": 0.3, "memory": 0.2}, "mem": 16, "photo": 18, "depth": 204}, {"id": "pearl", "name": "17 Pearl St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 10, "photo": 11, "depth": 42}, {"id": "bfm", "name": "Benjamin Franklin Museum", "city": "Philadelphia", "topic": "Museum", "day": 1, "obj": {"objects": 0.6, "authority": 0.5, "memory": 0.4, "space": 0.4, "unseen": 0.3}, "mem": 10, "photo": 19, "depth": 64}, {"id": "jeff", "name": "Thomas Jefferson Memorial", "city": "Washington DC", "topic": "Memorial", "day": 3, "obj": {"memory": 0.85, "authority": 0.7, "space": 0.6, "unseen": 0.55, "objects": 0.1}, "mem": 9, "photo": 10, "depth": 18}, {"id": "natgal", "name": "National Gallery of Art", "city": "Washington DC", "topic": "Museum", "day": 4, "obj": {"objects": 0.7, "space": 0.6, "authority": 0.6, "unseen": 0.4, "memory": 0.3}, "mem": 9, "photo": 13, "depth": 17}, {"id": "259elizabe", "name": "259 Elizabeth St Elizabeth St Manhattan", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 8, "photo": 11, "depth": 41}, {"id": "clarkstcla", "name": "Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 7, "photo": 10, "depth": 23}, {"id": "x", "name": "Unnamed place", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 7, "photo": 10, "depth": 42}, {"id": "60furmanst", "name": "60 Furman St Furman St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 6, "photo": 8, "depth": 44}, {"id": "1633broadw", "name": "1633 Broadway", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 5, "photo": 5, "depth": 42}, {"id": "96henryst", "name": "96 Henry St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 5, "photo": 5, "depth": 13}, {"id": "55clarkstc", "name": "55 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 5, "photo": 5, "depth": 8}, {"id": "330markets", "name": "330 Market St", "city": "Philadelphia", "topic": "Street", "day": 1, "obj": null, "mem": 5, "photo": 5, "depth": 293}, {"id": "scotus", "name": "Supreme Court of the US", "city": "Washington DC", "topic": "Historic", "day": 2, "obj": {"authority": 0.8}, "mem": 5, "photo": 5, "depth": 125}, {"id": "paceuniver", "name": "Pace University", "city": "New York", "topic": "Street", "day": 0, "obj": null, "mem": 4, "photo": 4, "depth": 15}, {"id": "josierober", "name": "Josie Robertson Plaza Manhattan", "city": "New York", "topic": "Park", "day": 12, "obj": null, "mem": 4, "photo": 4, "depth": 78}, {"id": "12waterstw", "name": "12 Water St Water St Manhattan", "city": "New York", "topic": "Street", "day": 0, "obj": null, "mem": 4, "photo": 8, "depth": 16}, {"id": "145w21stst", "name": "145 W 21st St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 4, "photo": 4, "depth": 24}, {"id": "capitalgal", "name": "Capital Gallery", "city": "Washington DC", "topic": "Museum", "day": 4, "obj": {"objects": 0.8}, "mem": 4, "photo": 5, "depth": 16}, {"id": "69clarkstc", "name": "69 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 3, "photo": 3, "depth": 6}, {"id": "74henryst", "name": "74 Henry St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 3, "photo": 3, "depth": 55}, {"id": "118142orch", "name": "118–142 Orchard St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 3, "photo": 3, "depth": 26}, {"id": "73clarkst", "name": "73 Clark St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 3, "photo": 3, "depth": 12}, {"id": "27sfourths", "name": "27 S Fourth St", "city": "Philadelphia", "topic": "Street", "day": 1, "obj": null, "mem": 3, "photo": 3, "depth": 16}, {"id": "10beekmans", "name": "10 Beekman St", "city": "New York", "topic": "Street", "day": 0, "obj": null, "mem": 3, "photo": 3, "depth": 36}, {"id": "218frontst", "name": "218 Front St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 3, "photo": 4, "depth": 6}, {"id": "92102henry", "name": "92–102 Henry St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 64}, {"id": "davidhkoch", "name": "David H. Koch Theater Manhattan", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 42}, {"id": "72st", "name": "72 St Manhattan", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 24}, {"id": "9599ehoust", "name": "95–99 E Houston St", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 28}, {"id": "museumofth", "name": "Museum of the American Revolution", "city": "Philadelphia", "topic": "Museum", "day": 1, "obj": {"memory": 0.8}, "mem": 2, "photo": 2, "depth": 255}, {"id": "8419baltim", "name": "8419 Baltimore Ave", "city": "Washington DC", "topic": "Street", "day": 2, "obj": null, "mem": 2, "photo": 2, "depth": 27}, {"id": "386elmwood", "name": "386 Elmwood Dr", "city": "New York", "topic": "Street", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 34}, {"id": "nationalai", "name": "National Air and Space Museum", "city": "Washington DC", "topic": "Museum", "day": 2, "obj": {"authority": 0.8}, "mem": 2, "photo": 3, "depth": 47}, {"id": "newyorksta", "name": "New York State Thruway S New York", "city": "New York", "topic": "Other", "day": 12, "obj": null, "mem": 2, "photo": 2, "depth": 50}], "cohort": {"mem": 562, "photo": 724, "depthAvg": 56, "objAvg": 75, "krPct": 54, "cov": {"space": 18, "objects": 17, "memory": 23, "unseen": 32, "authority": 9}, "students": 16, "places": 74, "allStudents": 24, "allMem": 750, "allPhoto": 948, "allPlaces": 108}, "scount": {"60furmanst": 1, "92102henry": 2, "73clarkstc": 5, "clarkstcla": 1, "69clarkstc": 1, "paceuniver": 1, "davidhkoch": 1, "josierober": 1, "1633broadw": 1, "x": 2, "72st": 1, "96henryst": 1, "74henryst": 1, "new": 1, "259elizabe": 1, "pearl": 1, "118142orch": 2, "9599ehoust": 1, "55clarkstc": 2, "12waterstw": 1, "145w21stst": 1, "clo": 5, "met": 4, "ind": 6, "museumofth": 1, "330markets": 1, "8419baltim": 2, "scotus": 2, "cap": 7, "nmai": 4, "jeff": 2, "aahm": 5, "capitalgal": 1, "mall": 2, "hol": 1, "386elmwood": 1, "73clarkst": 3, "27sfourths": 1, "bfm": 1, "nationalai": 1, "natgal": 1, "moma": 1, "newyorksta": 1, "10beekmans": 1, "218frontst": 1}, "places": [{"id": "aahm", "name": "Nat. Museum of African American History", "city": "Washington DC", "topic": "Museum", "day": 3, "mem": 80, "photo": 103, "depth": 99, "obj": {"unseen": 0.9, "memory": 0.95, "authority": 0.85, "space": 0.8, "objects": 0.5}}, {"id": "clo", "name": "The Met Cloisters", "city": "New York", "topic": "Museum", "day": 0, "mem": 78, "photo": 107, "depth": 78, "obj": {"space": 0.95, "objects": 0.7, "memory": 0.3, "unseen": 0.4, "authority": 0.6}}, {"id": "ind", "name": "Independence Hall", "city": "Philadelphia", "topic": "Historic", "day": 1, "mem": 66, "photo": 81, "depth": 118, "obj": {"memory": 0.95, "space": 0.7, "authority": 0.6, "unseen": 0.55, "objects": 0.2}}, {"id": "cap", "name": "US Capitol", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 30, "photo": 36, "depth": 100, "obj": {"authority": 0.85, "memory": 0.7, "space": 0.65, "unseen": 0.4, "objects": 0.2}}, {"id": "73clarkstc", "name": "73 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 29, "photo": 31, "depth": 48, "obj": null}, {"id": "hol", "name": "US Holocaust Memorial Museum", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 25, "photo": 34, "depth": 94, "obj": {"unseen": 0.95, "memory": 0.9, "space": 0.7, "objects": 0.5, "authority": 0.4}}, {"id": "moma", "name": "Museum of Modern Art (MoMA)", "city": "New York", "topic": "Museum", "day": 12, "mem": 23, "photo": 52, "depth": 44, "obj": {"objects": 0.7, "space": 0.5, "authority": 0.4, "unseen": 0.3, "memory": 0.2}}, {"id": "met", "name": "Metropolitan Museum", "city": "New York", "topic": "Museum", "day": 0, "mem": 22, "photo": 23, "depth": 87, "obj": {"objects": 0.85, "space": 0.7, "authority": 0.7, "unseen": 0.5, "memory": 0.3}}, {"id": "mall", "name": "National Mall & Memorial Parks", "city": "Washington DC", "topic": "Memorial", "day": 4, "mem": 22, "photo": 28, "depth": 66, "obj": {"memory": 0.9, "authority": 0.6, "unseen": 0.6, "space": 0.6, "objects": 0.1}}, {"id": "nmai", "name": "Nat. Museum of the American Indian", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 21, "photo": 28, "depth": 61, "obj": {"unseen": 0.85, "objects": 0.7, "authority": 0.6, "memory": 0.5, "space": 0.5}}, {"id": "new", "name": "New Museum", "city": "New York", "topic": "Museum", "day": 12, "mem": 16, "photo": 18, "depth": 204, "obj": {"objects": 0.6, "space": 0.5, "unseen": 0.4, "authority": 0.3, "memory": 0.2}}, {"id": "pearl", "name": "17 Pearl St", "city": "New York", "topic": "Street", "day": 12, "mem": 10, "photo": 11, "depth": 42, "obj": null}, {"id": "bfm", "name": "Benjamin Franklin Museum", "city": "Philadelphia", "topic": "Museum", "day": 1, "mem": 10, "photo": 19, "depth": 64, "obj": {"objects": 0.6, "authority": 0.5, "memory": 0.4, "space": 0.4, "unseen": 0.3}}, {"id": "jeff", "name": "Thomas Jefferson Memorial", "city": "Washington DC", "topic": "Memorial", "day": 3, "mem": 9, "photo": 10, "depth": 18, "obj": {"memory": 0.85, "authority": 0.7, "space": 0.6, "unseen": 0.55, "objects": 0.1}}, {"id": "natgal", "name": "National Gallery of Art", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 9, "photo": 13, "depth": 17, "obj": {"objects": 0.7, "space": 0.6, "authority": 0.6, "unseen": 0.4, "memory": 0.3}}, {"id": "259elizabe", "name": "259 Elizabeth St Elizabeth St Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 8, "photo": 11, "depth": 41, "obj": null}, {"id": "clarkstcla", "name": "Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 7, "photo": 10, "depth": 23, "obj": null}, {"id": "x", "name": "Unnamed place", "city": "New York", "topic": "Street", "day": 12, "mem": 7, "photo": 10, "depth": 42, "obj": null}, {"id": "60furmanst", "name": "60 Furman St Furman St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 6, "photo": 8, "depth": 44, "obj": null}, {"id": "55clarkstc", "name": "55 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "photo": 5, "depth": 9, "obj": null}, {"id": "1633broadw", "name": "1633 Broadway", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "photo": 5, "depth": 42, "obj": null}, {"id": "96henryst", "name": "96 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 5, "photo": 5, "depth": 13, "obj": null}, {"id": "330markets", "name": "330 Market St", "city": "Philadelphia", "topic": "Street", "day": 1, "mem": 5, "photo": 5, "depth": 293, "obj": null}, {"id": "scotus", "name": "Supreme Court of the US", "city": "Washington DC", "topic": "Historic", "day": 2, "mem": 5, "photo": 5, "depth": 125, "obj": {"authority": 0.8}}, {"id": "paceuniver", "name": "Pace University", "city": "New York", "topic": "Street", "day": 0, "mem": 4, "photo": 4, "depth": 15, "obj": null}, {"id": "josierober", "name": "Josie Robertson Plaza Manhattan", "city": "New York", "topic": "Park", "day": 12, "mem": 4, "photo": 4, "depth": 78, "obj": null}, {"id": "12waterstw", "name": "12 Water St Water St Manhattan", "city": "New York", "topic": "Street", "day": 0, "mem": 4, "photo": 8, "depth": 16, "obj": null}, {"id": "145w21stst", "name": "145 W 21st St", "city": "New York", "topic": "Street", "day": 12, "mem": 4, "photo": 4, "depth": 24, "obj": null}, {"id": "capitalgal", "name": "Capital Gallery", "city": "Washington DC", "topic": "Museum", "day": 4, "mem": 4, "photo": 5, "depth": 16, "obj": {"objects": 0.8}}, {"id": "69clarkstc", "name": "69 Clark St Clark St Brooklyn", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "photo": 3, "depth": 6, "obj": null}, {"id": "74henryst", "name": "74 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "photo": 3, "depth": 55, "obj": null}, {"id": "218frontst", "name": "218 Front St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "photo": 4, "depth": 6, "obj": null}, {"id": "73clarkst", "name": "73 Clark St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "photo": 3, "depth": 12, "obj": null}, {"id": "118142orch", "name": "118–142 Orchard St", "city": "New York", "topic": "Street", "day": 12, "mem": 3, "photo": 3, "depth": 27, "obj": null}, {"id": "10beekmans", "name": "10 Beekman St", "city": "New York", "topic": "Street", "day": 0, "mem": 3, "photo": 3, "depth": 36, "obj": null}, {"id": "27sfourths", "name": "27 S Fourth St", "city": "Philadelphia", "topic": "Street", "day": 1, "mem": 3, "photo": 3, "depth": 16, "obj": null}, {"id": "92102henry", "name": "92–102 Henry St", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "photo": 2, "depth": 64, "obj": null}, {"id": "newyorksta", "name": "New York State Thruway S New York", "city": "New York", "topic": "Other", "day": 12, "mem": 2, "photo": 2, "depth": 50, "obj": null}, {"id": "davidhkoch", "name": "David H. Koch Theater Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "photo": 2, "depth": 42, "obj": null}, {"id": "72st", "name": "72 St Manhattan", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "photo": 2, "depth": 24, "obj": null}, {"id": "9599ehoust", "name": "95–99 E Houston St", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "photo": 2, "depth": 28, "obj": null}, {"id": "museumofth", "name": "Museum of the American Revolution", "city": "Philadelphia", "topic": "Museum", "day": 1, "mem": 2, "photo": 2, "depth": 255, "obj": {"memory": 0.8}}, {"id": "8419baltim", "name": "8419 Baltimore Ave", "city": "Washington DC", "topic": "Street", "day": 2, "mem": 2, "photo": 2, "depth": 27, "obj": null}, {"id": "nationalai", "name": "National Air and Space Museum", "city": "Washington DC", "topic": "Museum", "day": 2, "mem": 2, "photo": 3, "depth": 47, "obj": {"authority": 0.8}}, {"id": "386elmwood", "name": "386 Elmwood Dr", "city": "New York", "topic": "Street", "day": 12, "mem": 2, "photo": 2, "depth": 34, "obj": null}]};
+    this.students = R.students;
+    this.cohortPlaces = R.cohortPlaces;
+    this.cohort = R.cohort;
+    this.places = R.places;
+    this._built = true;
+  }
+
+  // ---------- chart builders ----------
+  packLane(arr, top, hh){
+    const cy=top+hh/2;
+    arr.sort((a,b)=>a.x-b.x);
+    const placed=[];
+    arr.forEach(p=>{
+      let y=cy, ok=false;
+      for(let k=0;k<80&&!ok;k++){
+        const off=k===0?0:Math.ceil(k/2)*((k%2)?1:-1)*(p.r*0.85+1.5);
+        y=cy+off;
+        if(y-p.r<top+2||y+p.r>top+hh-2) continue;
+        ok=!placed.some(q=>Math.hypot(q.x-p.x,q.y-y)<q.r+p.r+1.2);
+      }
+      p.y=y; placed.push(p);
+    });
+  }
+
+  buildSwarm(places, big){
+    const h=this.h.bind(this);
+    const cb=this.state.colorBy, sb=this.state.sizeBy;
+    const W=940, left=152, right=26, top=24, bottom=28;
+    const lanes = big ? [['New York',300],['Philadelphia',96],['Washington DC',152],['Unknown',44]]
+                      : [['New York',180],['Philadelphia',76],['Washington DC',112],['Unknown',40]];
+    let yy=top; const li={};
+    lanes.forEach(([c,hgt])=>{ li[c]={top:yy,h:hgt}; yy+=hgt; });
+    const totalH=yy+bottom;
+    const xs=d=>left+(d/24)*(W-left-right);
+    const vals=places.map(p=>sb==='mem'?p.mem:p.photo);
+    const maxV=Math.max(...vals,1);
+    const en=places.map(p=>{ const v=sb==='mem'?p.mem:p.photo; const r=4+(Math.sqrt(v)/Math.sqrt(maxV))*(big?22:18); return {...p,x:xs(p.day),r}; });
+    lanes.forEach(([c,hgt])=>{ this.packLane(en.filter(p=>p.city===c), li[c].top, hgt); });
+    const out=[];
+    lanes.forEach(([c,hgt],i)=>{
+      const L=li[c];
+      if(i%2===1) out.push(h('rect',{key:'bg'+i,x:0,y:L.top,width:W,height:hgt,fill:'rgba(33,31,27,0.022)'}));
+      out.push(h('circle',{key:'ld'+i,cx:16,cy:L.top+16,r:5,fill:this.cityColors[c]}));
+      out.push(h('text',{key:'ll'+i,x:28,y:L.top+20,fontSize:13,fontWeight:600,fill:'#211f1b',fontFamily:"'IBM Plex Sans KR',sans-serif"},c));
+      const lp=en.filter(p=>p.city===c);
+      out.push(h('text',{key:'ls'+i,x:28,y:L.top+36,fontSize:10,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},`${lp.length} places · ${lp.reduce((a,b)=>a+b.mem,0).toLocaleString()} mem`));
+    });
+    const ticks=[0,2,4,6,8,10,12,14,16,18,20,22,24];
+    const labs={11:'3/29',12:'3/30',14:'4/1'};
+    ticks.forEach((d,i)=>{ const x=xs(d); out.push(h('line',{key:'tk'+i,x1:x,y1:top,x2:x,y2:totalH-bottom,stroke:'rgba(33,31,27,0.05)',strokeWidth:1}));
+      if(labs[d]) out.push(h('text',{key:'tl'+i,x:x,y:totalH-9,textAnchor:'middle',fontSize:9,fill:'#b3aa9b',fontFamily:"'IBM Plex Mono',monospace"},labs[d])); });
+    en.forEach((p,i)=>{
+      const col=cb==='place'?this.cityColors[p.city]:this.topicColors[p.topic];
+      out.push(h('circle',{key:'c'+i,cx:p.x,cy:p.y,r:p.r,fill:col,fillOpacity:0.82,style:{cursor:'pointer'},
+        onMouseMove:(e)=>this.setState({hover:p,hoverMx:e.clientX,hoverMy:e.clientY}),
+        onMouseEnter:(e)=>this.setState({hover:p,hoverMx:e.clientX,hoverMy:e.clientY})}));
+      const showV=sb==='mem'?p.mem:p.photo;
+      if(p.r>14) out.push(h('text',{key:'v'+i,x:p.x,y:p.y+3.5,textAnchor:'middle',fontSize:9.5,fill:'#fff',fontFamily:"'IBM Plex Mono',monospace",style:{pointerEvents:'none'}},showV));
+      if(p.r>19) out.push(h('text',{key:'n'+i,x:p.x,y:p.y-p.r-4,textAnchor:'middle',fontSize:8.5,fill:'#57534a',fontFamily:"'IBM Plex Sans KR',sans-serif",style:{pointerEvents:'none'}}, p.name.length>22?p.name.slice(0,21)+'…':p.name));
+    });
+    return h('svg',{viewBox:`0 0 ${W} ${totalH}`,width:'100%',onMouseLeave:()=>this.setState({hover:null})},out);
+  }
+
+  buildBars(places){
+    const h=this.h.bind(this);
+    const data=[...places].sort((a,b)=>b.mem-a.mem).slice(0,12);
+    const max=data[0]?data[0].mem:1, rowH=22, bx=210, bw=200;
+    const rows=data.map((s,i)=>{ const y=4+i*rowH, len=Math.max(2,s.mem/max*bw), nm=s.name.length>28?s.name.slice(0,27)+'…':s.name;
+      return h('g',{key:i},
+        h('text',{x:0,y:y+12,fontSize:10,fill:'#3a362f',fontFamily:"'IBM Plex Sans KR',sans-serif"},nm),
+        h('rect',{x:bx,y:y+3,width:len,height:13,rx:2,fill:this.cityColors[s.city]}),
+        h('text',{x:bx+len+5,y:y+13,fontSize:9.5,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},s.mem.toLocaleString()));
+    });
+    return h('svg',{viewBox:`0 0 460 ${8+data.length*rowH}`,width:'100%'},rows);
+  }
+
+  buildScatter(places){
+    const h=this.h.bind(this);
+    const W=440,H=270,L=40,B=28,T=12,R=14, pw=W-L-R, ph=H-B-T;
+    const maxX=Math.max(...places.map(p=>p.mem),1)*1.08;
+    const maxY=Math.max(...places.map(p=>p.depth),1)*1.08;
+    const maxP=Math.max(...places.map(p=>p.photo),1);
+    const out=[];
+    [0,.25,.5,.75,1].forEach((g,i)=>{ const y=T+ph-g*ph; out.push(h('line',{key:'g'+i,x1:L,y1:y,x2:W-R,y2:y,stroke:'#eee6d6',strokeWidth:1}));
+      out.push(h('text',{key:'yt'+i,x:L-6,y:y+3,textAnchor:'end',fontSize:8,fill:'#b3aa9b',fontFamily:"'IBM Plex Mono',monospace"},Math.round(g*maxY))); });
+    places.forEach((s,i)=>{ const x=L+s.mem/maxX*pw, y=T+ph-s.depth/maxY*ph, r=3+s.photo/maxP*12, col=this.cityColors[s.city];
+      out.push(h('circle',{key:'c'+i,cx:x,cy:y,r,fill:col,fillOpacity:0.45,stroke:col,strokeWidth:1,style:{cursor:'pointer'},
+        onMouseMove:(e)=>this.setState({hover:s,hoverMx:e.clientX,hoverMy:e.clientY}),
+        onMouseEnter:(e)=>this.setState({hover:s,hoverMx:e.clientX,hoverMy:e.clientY})})); });
+    const lab=[...places].sort((a,b)=>(b.mem*b.depth)-(a.mem*a.depth)).slice(0,4);
+    lab.forEach((s,k)=>{ const x=L+s.mem/maxX*pw, y=T+ph-s.depth/maxY*ph; out.push(h('text',{key:'lb'+k,x:x+6,y:y-7,fontSize:8,fill:'#57534a',fontFamily:"'IBM Plex Mono',monospace",style:{pointerEvents:'none'}}, s.name.length>14?s.name.slice(0,13)+'…':s.name)); });
+    out.push(h('text',{key:'xl',x:L+pw/2,y:H-2,textAnchor:'middle',fontSize:8.5,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},'Frequency → No. of Memos'));
+    out.push(h('text',{key:'yl',x:11,y:T+ph/2,textAnchor:'middle',fontSize:8.5,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace",transform:`rotate(-90 11 ${T+ph/2})`},'Depth → Avg. Length'));
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',onMouseLeave:()=>this.setState({hover:null})},out);
+  }
+
+  buildRhythm(rhythm){
+    const h=this.h.bind(this);
+    const W=440,H=150,L=8,B=22,T=10, pw=W-L*2, ph=H-B-T, max=Math.max(...rhythm,1);
+    const bw=pw/24, out=[];
+    rhythm.forEach((v,i)=>{ const bh=v/max*ph; out.push(h('rect',{key:i,x:L+i*bw+1,y:T+ph-bh,width:bw-2,height:bh,rx:1.5,fill:i>=10&&i<=13?'#6e3a36':'#cbb9a0'})); });
+    [0,6,12,18,24].forEach((hh,i)=> out.push(h('text',{key:'t'+i,x:L+hh*bw,y:H-6,textAnchor:'middle',fontSize:9,fill:'#b3aa9b',fontFamily:"'IBM Plex Mono',monospace"}, hh+':00')));
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'},out);
+  }
+
+  arc(cx,cy,r,ir,a0,a1){ const p=(rr,a)=>[cx+rr*Math.cos(a),cy+rr*Math.sin(a)]; const lg=(a1-a0)>Math.PI?1:0;
+    const[x0,y0]=p(r,a0),[x1,y1]=p(r,a1),[x2,y2]=p(ir,a1),[x3,y3]=p(ir,a0);
+    return `M${x0},${y0} A${r},${r} 0 ${lg} 1 ${x1},${y1} L${x2},${y2} A${ir},${ir} 0 ${lg} 0 ${x3},${y3} Z`; }
+
+  buildDonut(topics, center, label){
+    const h=this.h.bind(this); const cx=64,cy=64,r=56,ir=34; let a0=-Math.PI/2;
+    const arcs=topics.map((t,i)=>{ const a1=a0+t.pct/100*Math.PI*2; const d=this.arc(cx,cy,r,ir,a0+0.012,a1-0.012); a0=a1; return h('path',{key:i,d,fill:t.color}); });
+    return h('svg',{viewBox:'0 0 128 128',width:128,height:128},arcs,
+      h('text',{x:cx,y:cy-1,textAnchor:'middle',fontSize:16,fontFamily:"'Source Serif 4',serif",fill:'#211f1b',fontWeight:600},center),
+      h('text',{x:cx,y:cy+13,textAnchor:'middle',fontSize:7.5,fontFamily:"'IBM Plex Mono',monospace",fill:'#9a948a'},label||'MEMOS'));
+  }
+
+  buildRing(pct, color, sub){
+    const h=this.h.bind(this); const sz=108,cx=54,cy=54,r=43,C=2*Math.PI*r, off=C*(1-pct/100);
+    return h('svg',{viewBox:`0 0 ${sz} ${sz}`,width:sz,height:sz},
+      h('circle',{cx,cy,r,fill:'none',stroke:'#efe9db',strokeWidth:10}),
+      h('circle',{cx,cy,r,fill:'none',stroke:color,strokeWidth:10,strokeLinecap:'round',strokeDasharray:C,strokeDashoffset:off,transform:`rotate(-90 ${cx} ${cy})`}),
+      h('text',{x:cx,y:cy-1,textAnchor:'middle',fontSize:21,fontWeight:600,fontFamily:"'Source Serif 4',serif",fill:'#211f1b'},pct+'%'),
+      h('text',{x:cx,y:cy+15,textAnchor:'middle',fontSize:8,fontFamily:"'IBM Plex Mono',monospace",fill:'#9a948a'},sub||''));
+  }
+
+  buildHistogram(values, color){
+    const h=this.h.bind(this); const W=320,H=130,L=10,B=24,T=10;
+    const max=Math.max(...values,1), bins=6, hi=Math.max(50,Math.ceil(max/50)*50), bw=hi/bins;
+    const counts=new Array(bins).fill(0);
+    values.forEach(v=>{ counts[Math.min(bins-1,Math.floor(v/bw))]++; });
+    const cmax=Math.max(...counts,1), pw=(W-L*2)/bins, ph=H-B-T, out=[];
+    counts.forEach((c,i)=>{ const bh=c/cmax*ph; out.push(h('rect',{key:i,x:L+i*pw+3,y:T+ph-bh,width:pw-6,height:bh,rx:3,fill:color||'#6e3a36'}));
+      if(c) out.push(h('text',{key:'c'+i,x:L+i*pw+pw/2,y:T+ph-bh-4,textAnchor:'middle',fontSize:9,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},c)); });
+    [0,1,2,3,4,5,6].forEach(b=> out.push(h('text',{key:'x'+b,x:L+b*pw,y:H-7,textAnchor:'middle',fontSize:8,fill:'#b3aa9b',fontFamily:"'IBM Plex Mono',monospace"},(b*bw))));
+    out.push(h('text',{key:'unit',x:W-2,y:H-7,textAnchor:'end',fontSize:8,fill:'#c2b8a6',fontFamily:"'IBM Plex Mono',monospace"},'chars'));
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'},out);
+  }
+
+  buildQuadrant(flaggedIds){
+    const h=this.h.bind(this); const W=620,H=320,L=46,B=34,T=18,R=18, pw=W-L-R, ph=H-B-T;
+    const ss=this.students, n=ss.length;
+    const maxX=Math.max(...ss.map(s=>s.mem))*1.08, maxY=Math.max(...ss.map(s=>s.depthAvg))*1.1;
+    const sm=[...ss].map(s=>s.mem).sort((a,b)=>a-b), sd=[...ss].map(s=>s.depthAvg).sort((a,b)=>a-b);
+    const medX=sm[Math.floor(n/2)], medY=sd[Math.floor(n/2)];
+    const X=v=>L+v/maxX*pw, Y=v=>T+ph-v/maxY*ph, out=[];
+    out.push(h('rect',{key:'bg',x:L,y:T,width:pw,height:ph,fill:'#faf6ee',rx:4}));
+    out.push(h('line',{key:'mx',x1:X(medX),y1:T,x2:X(medX),y2:T+ph,stroke:'#e0d6c4',strokeWidth:1,strokeDasharray:'4 4'}));
+    out.push(h('line',{key:'my',x1:L,y1:Y(medY),x2:L+pw,y2:Y(medY),stroke:'#e0d6c4',strokeWidth:1,strokeDasharray:'4 4'}));
+    const corners=[['Deep and Broad',L+pw-8,T+14,'end'],['Broad but Shallow',L+pw-8,T+ph-8,'end'],['Narrow but Deep',L+8,T+14,'start'],['Caution — Narrow and Shallow',L+8,T+ph-8,'start']];
+    corners.forEach((c,i)=> out.push(h('text',{key:'cn'+i,x:c[1],y:c[2],textAnchor:c[3],fontSize:9,fill:i===3?'#c0392b':'#bdb3a1',fontFamily:"'IBM Plex Sans KR',sans-serif",fontWeight:i===3?600:400},c[0])));
+    ss.forEach((s,i)=>{ const fl=flaggedIds.includes(s.id); const x=X(s.mem), y=Y(s.depthAvg);
+      out.push(h('circle',{key:'c'+i,cx:x,cy:y,r:fl?7:5,fill:fl?'#c0392b':'#2f5d57',fillOpacity:fl?0.9:0.55,stroke:fl?'#c0392b':'none',strokeWidth:1.5}));
+      if(fl) out.push(h('text',{key:'l'+i,x:x,y:y-10,textAnchor:'middle',fontSize:8.5,fill:'#c0392b',fontWeight:600,fontFamily:"'IBM Plex Mono',monospace"},s.id)); });
+    out.push(h('text',{key:'xl',x:L+pw/2,y:H-4,textAnchor:'middle',fontSize:9,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},'Breadth of Recording → No. of Memos'));
+    out.push(h('text',{key:'yl',x:13,y:T+ph/2,textAnchor:'middle',fontSize:9,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace",transform:`rotate(-90 13 ${T+ph/2})`},'Depth of Reflection →'));
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'},out);
+  }
+
+  buildRadar(cov){
+    const h=this.h.bind(this); const keys=[['space','Space'],['objects','Classification'],['memory','Memory'],['unseen','Unseen'],['authority','Authority']];
+    const cx=130,cy=120,r=78,N=5, ang=i=>-Math.PI/2+i/N*Math.PI*2, out=[];
+    [0.33,0.66,1].forEach((g,gi)=>{ const pts=keys.map((_,i)=>`${cx+Math.cos(ang(i))*r*g},${cy+Math.sin(ang(i))*r*g}`).join(' '); out.push(h('polygon',{key:'r'+gi,points:pts,fill:'none',stroke:'#e6ddcd',strokeWidth:1})); });
+    keys.forEach((k,i)=>{ out.push(h('line',{key:'a'+i,x1:cx,y1:cy,x2:cx+Math.cos(ang(i))*r,y2:cy+Math.sin(ang(i))*r,stroke:'#e6ddcd',strokeWidth:1}));
+      const lx=cx+Math.cos(ang(i))*(r+15), ly=cy+Math.sin(ang(i))*(r+15);
+      out.push(h('text',{key:'l'+i,x:lx,y:ly+3,textAnchor:'middle',fontSize:9.5,fill:'#57534a',fontFamily:"'IBM Plex Sans KR',sans-serif"},k[1]));
+      out.push(h('text',{key:'v'+i,x:lx,y:ly+14,textAnchor:'middle',fontSize:8.5,fill:'#9a7b3f',fontFamily:"'IBM Plex Mono',monospace"},cov[k[0]]+'%')); });
+    const dp=keys.map((k,i)=>`${cx+Math.cos(ang(i))*r*(cov[k[0]]/100)},${cy+Math.sin(ang(i))*r*(cov[k[0]]/100)}`).join(' ');
+    out.push(h('polygon',{key:'d',points:dp,fill:'rgba(47,93,87,0.18)',stroke:'#2f5d57',strokeWidth:1.8}));
+    keys.forEach((k,i)=> out.push(h('circle',{key:'p'+i,cx:cx+Math.cos(ang(i))*r*(cov[k[0]]/100),cy:cy+Math.sin(ang(i))*r*(cov[k[0]]/100),r:2.6,fill:'#2f5d57'})));
+    return h('svg',{viewBox:'0 0 260 240',width:'100%'},out);
+  }
+
+  topicsOf(places){
+    const sum={}; let tot=0; places.forEach(p=>{ sum[p.topic]=(sum[p.topic]||0)+p.mem; tot+=p.mem; });
+    const order=['Museum','Street','Park','Historic','Memorial','Other'];
+    return order.filter(t=>sum[t]).map(t=>({topic:t, pct:Math.round(sum[t]/tot*100), color:this.topicColors[t], label:`${this.topicKR[t]} ${Math.round(sum[t]/tot*100)}%`}));
+  }
+
+  langOf(places, korean){
+    const order=['Museum','Park','Street','Historic','Memorial'];
+    const adj=korean/0.65;
+    return order.map(t=>{ const ps=places.filter(p=>p.topic===t); const notes=ps.reduce((a,b)=>a+b.mem,0); if(!notes) return null;
+      let kr=Math.round(Math.max(5,Math.min(95,(this.typeKorean[t]||.5)*adj*100))); let other=t==='Park'?5:(t==='Street'?3:2); let en=100-kr-other; if(en<0){en=0;}
+      return {t:this.topicKR[t], notes:notes.toLocaleString(), kr, en, other};
+    }).filter(Boolean);
+  }
+
+  buildMosaic(){
+    const h=this.h.bind(this);
+    const cities=['New York','Philadelphia','Washington DC'];
+    const W=940,H=520,top=44,bottom=4,gap=12;
+    const cp={}, cm={};
+    cities.forEach(c=>{ const ps=this.cohortPlaces.filter(p=>p.city===c).sort((a,b)=>b.mem-a.mem); cp[c]=ps; cm[c]=ps.reduce((a,b)=>a+b.mem,0); });
+    const tot=cities.reduce((a,c)=>a+cm[c],0)||1;
+    const avail=W-gap*(cities.length-1);
+    let x=0; const out=[];
+    cities.forEach((c,ci)=>{
+      const cw=cm[c]/tot*avail, ps=cp[c], N=7, head=ps.slice(0,N), rest=ps.slice(N);
+      const segs=[...head];
+      if(rest.length) segs.push({name:`+${rest.length} more places`, mem:rest.reduce((a,b)=>a+b.mem,0), topic:'Other', _g:true});
+      out.push(h('text',{key:'ch'+ci,x:x,y:20,fontSize:14,fontWeight:600,fill:'#211f1b',fontFamily:"'IBM Plex Sans KR',sans-serif"},c));
+      out.push(h('text',{key:'cm'+ci,x:x,y:36,fontSize:10.5,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},cm[c].toLocaleString()+' mem'));
+      const colH=H-top-bottom; let yy=top;
+      segs.forEach((s,si)=>{
+        const sh=Math.max(2, s.mem/(cm[c]||1)*colH-2);
+        const col=s._g?'#cbb9a0':this.topicColors[s.topic];
+        out.push(h('rect',{key:ci+'s'+si,x:x,y:yy,width:cw,height:sh,rx:3,fill:col,
+          style:s._g?undefined:{cursor:'pointer'},
+          onMouseMove:s._g?undefined:(e)=>this.setState({hover:{...s,city:c,depth:this.cohortPlaces.find(p=>p.name===s.name)?.depth||0},hoverMx:e.clientX,hoverMy:e.clientY}),
+          onMouseEnter:s._g?undefined:(e)=>this.setState({hover:{...s,city:c,depth:this.cohortPlaces.find(p=>p.name===s.name)?.depth||0},hoverMx:e.clientX,hoverMy:e.clientY})}));
+        if(sh>26){
+          out.push(h('text',{key:ci+'t'+si,x:x+11,y:yy+19,fontSize:11.5,fontWeight:600,fill:'#fff',fontFamily:"'IBM Plex Sans KR',sans-serif",style:{pointerEvents:'none'}}, s.name.length>26?s.name.slice(0,25)+'…':s.name));
+          out.push(h('text',{key:ci+'p'+si,x:x+11,y:yy+34,fontSize:10,fill:'rgba(255,255,255,.82)',fontFamily:"'IBM Plex Mono',monospace",style:{pointerEvents:'none'}}, `${s.mem} · ${Math.round(s.mem/(cm[c]||1)*100)}%`));
+        }
+        yy+=sh+2;
+      });
+      x+=cw+gap;
+    });
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',onMouseLeave:()=>this.setState({hover:null})},out);
+  }
+
+  buildMap(){
+    const h=this.h.bind(this);
+    const W=940,H=470;
+    const coords={'New York':[-74.0,40.71],'Philadelphia':[-75.16,39.95],'Washington DC':[-77.04,38.9]};
+    const lo0=-77.9,lo1=-73.3,la0=38.2,la1=41.4;
+    const mx=lon=>110+(lon-lo0)/(lo1-lo0)*(W-200);
+    const my=lat=>50+(la1-lat)/(la1-la0)*(H-120);
+    const out=[];
+    out.push(h('rect',{key:'bg',x:0,y:0,width:W,height:H,rx:6,fill:'#faf6ee'}));
+    for(let lo=-77;lo<=-74;lo++){ const x=mx(lo); out.push(h('line',{key:'gx'+lo,x1:x,y1:34,x2:x,y2:H-34,stroke:'#ece5d6',strokeWidth:1})); out.push(h('text',{key:'lx'+lo,x:x,y:H-16,textAnchor:'middle',fontSize:8.5,fill:'#c2b8a6',fontFamily:"'IBM Plex Mono',monospace"},lo+'°')); }
+    for(let la=39;la<=41;la++){ const y=my(la); out.push(h('line',{key:'gy'+la,x1:80,y1:y,x2:W-46,y2:y,stroke:'#ece5d6',strokeWidth:1})); out.push(h('text',{key:'ly'+la,x:72,y:y+3,textAnchor:'end',fontSize:8.5,fill:'#c2b8a6',fontFamily:"'IBM Plex Mono',monospace"},la+'°N')); }
+    const order=['New York','Philadelphia','Washington DC'];
+    const pts=order.map(c=>[mx(coords[c][0]),my(coords[c][1])]);
+    out.push(h('polyline',{key:'route',points:pts.map(p=>p.join(',')).join(' '),fill:'none',stroke:'#9a7b3f',strokeWidth:2,strokeDasharray:'7 5'}));
+    const cm={}; order.forEach(c=>cm[c]=this.cohortPlaces.filter(p=>p.city===c).reduce((a,b)=>a+b.mem,0));
+    const maxM=Math.max(...Object.values(cm),1);
+    order.forEach((c,ci)=>{
+      const [cx,cy]=pts[ci];
+      const ps=this.cohortPlaces.filter(p=>p.city===c);
+      ps.forEach((p,i)=>{ const ang=i/ps.length*Math.PI*2; const rad=44+(i%4)*13; out.push(h('circle',{key:c+'d'+i,cx:cx+Math.cos(ang)*rad,cy:cy+Math.sin(ang)*rad,r:Math.min(6,2+Math.sqrt(p.mem)*0.22),fill:this.topicColors[p.topic],fillOpacity:0.45})); });
+      const Rr=22+Math.sqrt(cm[c]/maxM)*30;
+      out.push(h('circle',{key:'r'+ci,cx,cy,r:Rr,fill:this.cityColors[c],fillOpacity:0.14,stroke:this.cityColors[c],strokeWidth:2}));
+      out.push(h('circle',{key:'c'+ci,cx,cy,r:5,fill:this.cityColors[c]}));
+      out.push(h('text',{key:'n'+ci,x:cx,y:cy-Rr-9,textAnchor:'middle',fontSize:13.5,fontWeight:600,fill:'#211f1b',fontFamily:"'IBM Plex Sans KR',sans-serif"},c));
+      out.push(h('text',{key:'s'+ci,x:cx,y:cy-Rr+7,textAnchor:'middle',fontSize:10,fill:'#7a7264',fontFamily:"'IBM Plex Mono',monospace"},cm[c].toLocaleString()+' mem · '+ps.length+' places'));
+    });
+    out.push(h('text',{key:'north',x:W-58,y:46,fontSize:11,fontWeight:600,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},'↑ N'));
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%'},out);
+  }
+
+  buildTimetable(){
+    const h=this.h.bind(this);
+    const days=[['3.29 Sun','New York'],['3.30 Mon','Philadelphia'],['3.31 Tue','Washington DC'],['4.1 Wed','Washington DC'],['4.2 Thu','Departure']];
+    const sessions=[
+      {d:0,s:10,e:13,t:'The Met Cloisters',id:'clo'},
+      {d:0,s:13,e:15,t:'Lunch',gray:1},
+      {d:0,s:15,e:18,t:'The Met',id:'met'},
+      {d:1,s:8,e:10,t:'NY → Phila Transfer',gray:1},
+      {d:1,s:11,e:13,t:'Independence Hall',id:'ind'},
+      {d:1,s:13,e:15,t:'Lunch',gray:1},
+      {d:1,s:15,e:17,t:'Benjamin Franklin Museum',id:'bfm'},
+      {d:1,s:17,e:20,t:'Phila → DC Transfer',gray:1},
+      {d:2,s:9,e:11,t:'US Capitol',id:'cap'},
+      {d:2,s:11,e:13,t:'Library of Congress',id:'lib'},
+      {d:2,s:13,e:15,t:'Lunch',gray:1},
+      {d:2,s:15,e:17,t:'Museum of American Indian',id:'nmai'},
+      {d:2,s:17,e:19,t:'Georgetown Free Time',gray:1},
+      {d:3,s:11,e:14,t:'African American History',id:'aahm'},
+      {d:3,s:14,e:16,t:'Seminar · America and the World',gray:1},
+      {d:3,s:16,e:19,t:'Lincoln · White House',ids:['linc','wh']},
+      {d:3,s:19,e:20,t:'Dinner',gray:1},
+      {d:4,s:9,e:12,t:'Free Visit (Student Choice)',gray:1},
+    ];
+    const W=940,left=52,top=46,right=8,hourH=34,t0=8,t1=21;
+    const H=top+(t1-t0)*hourH+6, dayW=(W-left-right)/5;
+    const memOf=s=> s.id?(this.cohortPlaces.find(p=>p.id===s.id)||{}).mem||0 : (s.ids?s.ids.reduce((a,id)=>a+((this.cohortPlaces.find(p=>p.id===id)||{}).mem||0),0):0);
+    const maxM=Math.max(...sessions.map(memOf),1), Y=t=>top+(t-t0)*hourH, out=[];
+    days.forEach((d,i)=>{ const x=left+i*dayW;
+      out.push(h('text',{key:'dh'+i,x:x+dayW/2,y:18,textAnchor:'middle',fontSize:12,fontWeight:600,fill:'#211f1b',fontFamily:"'IBM Plex Sans KR',sans-serif"},d[0]));
+      out.push(h('text',{key:'dc'+i,x:x+dayW/2,y:33,textAnchor:'middle',fontSize:9.5,fill:'#9a948a',fontFamily:"'IBM Plex Mono',monospace"},d[1])); });
+    for(let t=t0;t<=t1;t++){ const y=Y(t); out.push(h('line',{key:'g'+t,x1:left,y1:y,x2:W-right,y2:y,stroke:'#efe9db',strokeWidth:1}));
+      out.push(h('text',{key:'tl'+t,x:left-8,y:y+4,textAnchor:'end',fontSize:9,fill:'#b3aa9b',fontFamily:"'IBM Plex Mono',monospace"},(t<10?'0'+t:t)+':00')); }
+    sessions.forEach((s,i)=>{ const x=left+s.d*dayW+3, w=dayW-6, y=Y(s.s)+2, hgt=(s.e-s.s)*hourH-4, mem=memOf(s), inten=mem/maxM;
+      const fill=s.gray?'#ece6d8':`rgba(110,58,54,${0.13+inten*0.84})`, dark=!s.gray&&inten>0.46;
+      out.push(h('rect',{key:'s'+i,x,y,width:w,height:hgt,rx:5,fill,style:s.gray?undefined:{cursor:'pointer'},
+        onMouseMove:s.gray?undefined:(e)=>this.setState({hover:{name:s.t,city:days[s.d][1],topic:'Schedule · Engagement',mem,photo:'—',depth:'—'},hoverMx:e.clientX,hoverMy:e.clientY}),
+        onMouseEnter:s.gray?undefined:(e)=>this.setState({hover:{name:s.t,city:days[s.d][1],topic:'Schedule · Engagement',mem,photo:'—',depth:'—'},hoverMx:e.clientX,hoverMy:e.clientY})}));
+      out.push(h('text',{key:'st'+i,x:x+8,y:y+16,fontSize:10.5,fontWeight:600,fill:s.gray?'#9a948a':(dark?'#fff':'#4a2c29'),fontFamily:"'IBM Plex Sans KR',sans-serif",style:{pointerEvents:'none'}}, s.t.length>21?s.t.slice(0,20)+'…':s.t));
+      if(!s.gray) out.push(h('text',{key:'sm'+i,x:x+8,y:y+31,fontSize:9.5,fill:dark?'rgba(255,255,255,.85)':'#9a7b3f',fontFamily:"'IBM Plex Mono',monospace",style:{pointerEvents:'none'}}, mem.toLocaleString()+' memo')); });
+    return h('svg',{viewBox:`0 0 ${W} ${H}`,width:'100%',onMouseLeave:()=>this.setState({hover:null})},out);
+  }
+
+  renderVals(){
+    this.build();
+    const N=this.students.length;
+    const scount={}; this.students.forEach(s=>s.places.forEach(p=>{scount[p.id]=(scount[p.id]||0)+1;}));
+    const S=this.state, set=(o)=>this.setState(o);
+    const navDef=[['cohort','Cohort Overview','Aggregate · Compare · Monitor'],['places','Analysis by Place','Reflection Synthesis'],['objectives','Learning Objectives in Depth','Five Themes Explained'],['students','Analysis by Student',N+' Students · Drill-down'],['diagnose','Diagnosis','Strengths · Gaps · Recommendations'],['method','Methodology','Problem → Limits']];
+    const navItems=navDef.map(([k,label,sub])=>({key:k,label,sub,bg:S.view===k?'#36322a':'transparent',color:S.view===k?'#fbf8f1':'#cabfae',onClick:()=>set({view:k, student:null, place:null, hover:null})}));
+
+    const isCohort=S.view==='cohort', isObjectives=S.view==='objectives', isStudents=S.view==='students';
+    const isPlaces=S.view==='places', isDiagnose=S.view==='diagnose', isMethod=S.view==='method';
+    const showGrid=isStudents&&S.student===null, showDetail=isStudents&&S.student!==null;
+    const showPlaceGrid=isPlaces&&S.place===null, showPlaceDetail=isPlaces&&S.place!==null;
+
+    const legendItems = S.colorBy==='place'
+      ? [['New York'],['Philadelphia'],['Washington DC'],['Unknown']].map(([c])=>({label:c,color:this.cityColors[c]}))
+      : ['Museum','Street','Park','Historic','Memorial','Other'].map(t=>({label:this.topicKR[t],color:this.topicColors[t]}));
+
+    const studentNav=this.students.map(s=>({id:s.id,tag:s.tag,cityColor:this.cityColors[s.topCity],bg:S.student===s.idx?'#36322a':'transparent',color:S.student===s.idx?'#fbf8f1':'#d6cdbb',onClick:()=>set({student:s.idx,hover:null})}));
+    const C=this.cohort;
+
+    const R={
+      navItems, studentNav, isCohort, isObjectives, isStudents, isPlaces, isDiagnose, showGrid, showDetail, showPlaceGrid, showPlaceDetail,
+      hover:S.hover, hoverMx:S.hoverMx, hoverMy:S.hoverMy,
+      legendItems, studentCount:N, isMethod,
+      sideStat:`cohort n=${C.allStudents} · ${C.allMem.toLocaleString()} memos\n${C.allPlaces} places · 3 cities · 5 days`,
+      topicLegend: ['Museum','Historic','Memorial','Park','Street','Other'].map(t=>({label:this.topicKR[t],color:this.topicColors[t]})),
+      viewKicker: isMethod?'METHODOLOGY · RUBRIC':(isCohort?('COHORT · n='+C.allStudents):(isObjectives?'LEARNING OBJECTIVES':(isPlaces?'PLACES':(isDiagnose?'DIAGNOSIS':'STUDENT PROFILE')))),
+      viewTitle: isMethod?'Methodology & Analytical Report':(isCohort?'Cohort Learning Overview':(isObjectives?'The Five Learning Objectives':(isPlaces?(showPlaceGrid?'Analysis by Place':'Place Report'):(isDiagnose?'Learning Diagnosis':(showGrid?'Analysis by Student':'Individual Analysis Report'))))),
+      viewSub: isMethod?`The full analytical narrative behind this dashboard — the seven rubric areas, written as a document. Problem definition, data preparation, EDA, visualization rationale, findings, recommendations, and limitations, with the actual statistical diagnostics.`:(isCohort?`We read the ${C.allMem.toLocaleString()} memos and ${C.allPhoto.toLocaleString()} photos that ${C.allStudents} students left over five days in terms of where they lingered, what they attended to, and how it connects to the learning objectives. Hover over a bubble to see per-place detail. (Analysis by place and student is based on the ${C.places} sites mapped to a learning objective.)`
+        :(isObjectives?'We grouped the analytical questions of the handout "The Seen and The Unseen" into five themes and measured how deeply the cohort engaged each one.'
+        :(isPlaces?(showPlaceGrid?'Select a place to see a synthesis of the reflections students left there and which learning objectives it contributes to.':'A synthesis of where students\' attention converged at this place.')
+        :(isDiagnose?'We synthesize the cohort\'s learning signals to diagnose strengths and gaps, and organize actionable recommendations for the next tour.'
+        :(showGrid?'Select one student to see that student\'s full circulation, depth, language, and objective coverage.':'From circulation to reflection, we compare all of this student\'s learning signals against the cohort.'))))),
+    };
+
+    if(isMethod){
+      R.method=[
+        {num:'01', title:'Problem Definition & Analytical Objectives', en:'Why measure learning on a field tour?',
+         blocks:[
+          {h:'The problem', body:'Experiential field learning is pedagogically rich but notoriously hard to assess. Unlike a classroom there is no exam and no submitted artifact at the moment of encounter, and an instructor cannot observe 24 students across 11 sites simultaneously. The GET USA tour "The Seen and The Unseen" assigns each site an explicit critical-museology objective — yet no one can see whether students actually engaged it, what they thought on site, or how their attention compared to peers.'},
+          {h:'Why it matters · three stakeholder gaps', body:'Instructor — no visibility into whether site-level objectives were met. Peer — students cannot see each other’s (or seniors’) reflections, so learning stays private. Individual — no tool to review where one’s own attention rested. FieldAtlas passively logs each memory (note + photos + geolocation + timestamp) on site, which is an unobtrusive behavioral trace of attention — closer to what students actually noticed than a retrospective essay.'},
+          {h:'Research questions', body:'RQ1 Distribution — when/where/how intensely did attention concentrate? RQ2 Depth — which encounters produced shallow capture vs deep reflection? RQ3 Alignment — did recorded attention match each site’s intended objective? RQ4 Difference — do sites elicit different kinds of engagement, and is the difference statistically real?'},
+         ]},
+        {num:'02', title:'Data Understanding & Preparation', en:'Turning free text into analyzable structure',
+         blocks:[
+          {h:'Source & variables', body:'FieldAtlas export memories_all_20260410.csv — 750 rows (1 row = 1 memory), 18 columns, 24 user_ids. Key fields: memo (free text, 83% non-null), embedding (3,072-dim vector, 98%), tags (97%), location_name + lat/lon (82–83%), photos (JSON), created_at, user_id. Daily volume matches the official itinerary exactly (3/29 NY · 3/30 Philadelphia · 3/31–4/2 DC), confirming the data is this tour.'},
+          {h:'Quality scan', body:'Empty columns ai_summary / epistemic / trip_id (0%) were dropped; dominant_colors (3%) too sparse for color analysis; truncated tags partially recovered by keyword grouping; a London coordinate outlier (27 memories, off-tour) was excluded and flagged. The 24 days span both the 5 core tour days and the NY home-base period, which were kept distinct.'},
+          {h:'Feature engineering', body:'Per memory we derived: topic (6 classes from location keywords), objective (the 5 handout themes, mapped by site — 426/750 memories map to a learning objective), city (coordinate clustering), language (Korean/English by character ratio), len (memo length as a depth proxy), local_hour (UTC−4 = US Eastern), and a 7-cluster KMeans over the 3,072-dim embeddings (k chosen by silhouette). All per-student and per-place aggregates in this dashboard are computed directly from user_id-level records in the CSV.'},
+         ]},
+        {num:'03', title:'Exploratory Data Analysis', en:'Exploration drove every design choice',
+         blocks:[
+          {h:'Distribution', body:'Activity is highly uneven in time: ~49% of all memories fall between 9 a.m. and noon (single peak at 11 a.m., 177 captures), and — counter-intuitively — Sunday is the busiest day (154) while Saturday is the quietest (43), because Saturday was travel/rest and Sunday held the core NY visit.'},
+          {h:'Depth, relationship, anomaly', body:'Memo length is strongly right-skewed (mean 101, median 38, max 2,177 chars); ~19% of memos exceed 150 characters — genuine reflection, not check-ins. Memories and photos correlate near-perfectly at the place level (r = 0.99), so the insight is the residual: MoMA alone reaches 2.3 photos per memory. Anomalies handled: one home-base user (404 memories) and the London outlier.'},
+          {h:'How findings shaped the design', body:'The morning concentration → the hour-of-day rhythm chart; the weekend paradox → a day-of-week bar; the residual signal → a breadth-vs-depth scatter sized by photos; the 7 embedding clusters split sharply by city → a semantic map; the uneven objective counts → the coverage radar.'},
+         ]},
+        {num:'04', title:'Visualization Design & Dashboard', en:'Editorial clarity, statistically grounded',
+         blocks:[
+          {h:'Audience & principles', body:'The reader is an instructor wanting a program overview. The design borrows newsroom clarity (serif headlines, mono data labels, a warm paper palette) and keeps three lenses — cohort, place, student — in one console with filter/hover/drill-down. Each chart encodes the fewest variables needed: the swarm encodes time + place + volume; the mosaic encodes city width + place composition; the scatter adds photos as a third channel.'},
+          {h:'Chart rationale', body:'Radar for objective coverage (compare 5 themes on one axis); bubble timeline for the journey (time + dwell weight); day×hour heatmap for dual-categorical density; 100% stacked bars for language by place-type; quadrant plot for the diagnosis (breadth × depth with median splits).'},
+          {h:'Design iterations (v1 → v2)', body:'Scatter axes moved from categorical to numerical so the MoMA outlier became visible; the pace view became a slope graph; the city comparison added per-day and statistical tests; the embedding column — once mislabeled "empty" — became the semantic map. These iterations followed the 2026-06-04 workshop feedback.'},
+         ]},
+        {num:'05', title:'Insights & Analytical Findings', en:'Did attention follow the curriculum?',
+         blocks:[
+          {h:'Alignment — the curriculum mostly worked', body:'Recorded attention aligns with the intended objectives, and the most affectively charged objective drew the most engagement. "The Seen / The Unseen" (NMAAHC, Holocaust, American Indian) is the single largest objective at 32% of mapped memories; the top-engagement site overall (NMAAHC, 80 memories) is also the deepest cluster. Memo evidence ("I feel exhibited, not the viewer"; "this bell pierces history and spirit") shows students performing the exact critical moves the handout asked for.'},
+          {h:'The gap — a flag for the instructor', body:'"Authority & Cultural Power" (Capitol, Library of Congress) is the lowest objective at just 9%. The "who is missing from the walls" prompt was the least exercised — an actionable signal to strengthen next time.'},
+          {h:'Statistical diagnostics', body:'Two questions, opposite answers — and effect sizes carry the conclusion, since memos are clustered within students and places (pseudoreplication) and some cells are sparse:',
+           diag:'MANOVA  City → (memories, photos)   place-level n=46\n   Wilks Λ = 0.955   exact F(4,84) = 0.49   p = 0.747   (not significant)\n   → photos track memories ~1.3× in every city; recording STRUCTURE is city-invariant\nChi-square  City × place-type   memo-level\n   χ² = 562   Cramér’s V = 0.71 (large)   [place-level n=46] V = 0.56 (large)\n   → WHAT was recorded differs sharply: NY=streets · DC=museums/memorials · Phila=one park\nGoF  Objective coverage vs uniform   mapped n=426\n   χ²(4) = 61.4   p = 1.5e-12   Cohen’s w = 0.38\n   → not uniform: O4 Unseen over-represented (32%) · O5 Authority under (9%)\n⚠ limits: pseudoreplication + expected cell <5 → read effect sizes (V, w), not p, as primary'},
+         ]},
+        {num:'06', title:'Recommendations & Decision Support', en:'A decision tool, not a pretty picture',
+         blocks:[
+          {h:'For the instructor', body:'Use the objective-coverage diagnosis to act: strengthen the under-engaged "Authority & Cultural Power" objective with a pre-visit prompt at the Capitol and Library of Congress; schedule core analytic activities in the morning, when ~49% of recording happens; and reconsider the back-half itinerary, since cumulative recording effectively saturates before the calendar ends.'},
+          {h:'For peers & individuals', body:'The semantic map becomes a shared interpretive space where peers and seniors’ reflections are explorable by meaning; the per-student profile is a metacognitive mirror — "where did my attention rest, in what language, on which objectives." The "intention vs reality" loop (planned objective weight vs recorded attention) gives evidence-based curriculum feedback each term.'},
+         ]},
+        {num:'07', title:'Reflection, Limitations & Future', en:'What can and cannot be trusted',
+         blocks:[
+          {h:'Limitations', body:'Aggregation — 24 users analyzed together, with one home-base user holding 404 memories; per-student drill-down covers the 16 students who recorded at objective-mapped sites. Validity — photo/memo counts are an engagement proxy, not learning itself ("attended" ≠ "learned"). Method — pseudoreplication and sparse cells make p-values optimistic, so effect sizes are the primary evidence; objective mapping is a handout-based heuristic. Sample — a single cohort on a single tour, better suited to description than generalization.'},
+          {h:'Future improvements', body:'Split the three stakeholder views with user_id filtering as a first-class control; codify each site’s learning objective so embedding clusters auto-match and under-served objectives auto-flag; accumulate the semantic map across senior cohorts for interpretive continuity; and model argument structure / critical-thinking signals in the memos to refine the depth measure beyond raw length.'},
+         ]},
+      ];
+    }
+
+    if(isCohort){
+      R.kpis=[{v:String(C.allStudents),l:'Students'},{v:C.allMem.toLocaleString(),l:'Memos'},{v:C.allPhoto.toLocaleString(),l:'Photos'},{v:String(C.allPlaces),l:'Places'},{v:C.depthAvg+' chars',l:'Avg. Depth'},{v:C.objAvg+'%',l:'Objective Coverage'}];
+      R.setColorPlace=()=>set({colorBy:'place'}); R.setColorTopic=()=>set({colorBy:'topic'});
+      R.setSizeMem=()=>set({sizeBy:'mem'}); R.setSizePhoto=()=>set({sizeBy:'photo'});
+      const on='#211f1b', onf='#fff', off='transparent', offf='#7a7264';
+      R.colorPlaceBg=S.colorBy==='place'?onf:off; R.colorPlaceFg=S.colorBy==='place'?on:offf;
+      R.colorTopicBg=S.colorBy==='topic'?onf:off; R.colorTopicFg=S.colorBy==='topic'?on:offf;
+      R.sizeMemBg=S.sizeBy==='mem'?onf:off; R.sizeMemFg=S.sizeBy==='mem'?on:offf;
+      R.sizePhotoBg=S.sizeBy==='photo'?onf:off; R.sizePhotoFg=S.sizeBy==='photo'?on:offf;
+      R.swarm=this.buildSwarm(this.cohortPlaces,true);
+      R.anchorBars=this.buildBars(this.cohortPlaces);
+      R.scatter=this.buildScatter(this.cohortPlaces.filter(p=>p.mem>=8));
+      R.rhythm=this.buildRhythm(this.students.reduce((a,s)=>a.map((v,i)=>v+s.rhythm[i]),new Array(24).fill(0)));
+      R.langBars=this.langOf(this.cohortPlaces,this.cohort.krPct/100*0.65);
+      R.topics=this.topicsOf(this.cohortPlaces);
+      R.topicDonut=this.buildDonut(this.topicsOf(this.cohortPlaces),(this.cohort.mem/1000).toFixed(1)+'K');
+      R.objMini=this.objMeta.map(o=>({num:o.num,kr:o.kr,pct:this.cohort.cov[o.key]}));
+      const ckr=this.cohort.krPct, cen=Math.max(0,96-ckr);
+      R.langDonut=this.buildDonut([{pct:ckr,color:'#6e3a36'},{pct:cen,color:'#c7b29a'},{pct:Math.max(0,100-ckr-cen),color:'#e2d8c6'}], ckr+'%', 'Korean');
+      const ranked=[...this.objMeta].sort((a,b)=>this.cohort.cov[b.key]-this.cohort.cov[a.key]);
+      const hi=ranked[0], lo=ranked[ranked.length-1];
+      R.capTrail='Each lane is a city; the horizontal axis is the five days of time. One bubble is one place, and its size is the volume of records left there. A base camp spread out across New York, a single day\'s burst in Philadelphia, three days compressed into museums in Washington DC — the tourist cities are recorded more densely than the home base.';
+      R.capAnchors='The places mapped to learning objectives. The cohort\'s memories were made overwhelmingly more in galleries and memorials than on the streets.';
+      R.capScatter='The horizontal axis is how often (frequency), the vertical how deeply (memo length). Memorials and sites of remembrance sit toward the top (infrequent but long and contemplative); streets sit at the lower left (frequent but fleeting). The National Museum of African American History is a rare place that has both breadth and depth.';
+      R.capRhythm='Recording clusters strongly between 11 a.m. and 1 p.m., thins out the further it moves from noon, and all but vanishes at night — a late-morning cohort.';
+      R.capVoice='The type of place changes the language of thought. In museums and exhibitions the share of the mother tongue (Korean) is high; out on the streets it shifts to English, the language of that place.';
+      R.capObj=`Coverage, converting memos into learning-objective weights. "${hi.kr}" (${this.cohort.cov[hi.key]}%) is the highest and "${lo.kr}" (${this.cohort.cov[lo.key]}%) the lowest — the least-practiced critical objective.`;
+      R.mosaic=this.buildMosaic();
+      R.map=this.buildMap();
+      R.timetable=this.buildTimetable();
+      R.capTimetable='We painted actual engagement onto the official five-day itinerary. The darker a schedule cell, the more memos were left there — at a glance you can see where planned time and actual learning overlap and where they diverge.';
+      R.capMosaic='The width of each column is the volume of records left in that city; each column is split into individual places and painted in topic colors. New York is the widest but scatters across many places, while Philadelphia is effectively the single site of Independence Hall.';
+      R.capMap='The five-day route running New York → Philadelphia → Washington DC. Circle size is the recording volume per city, and the surrounding dots mark individual places in topic colors.';
+    }
+
+    if(isObjectives){
+      const oranked=[...this.objMeta].sort((a,b)=>C.cov[b.key]-C.cov[a.key]);
+      const hiKey=oranked[0].key, loKey=oranked[oranked.length-1].key;
+      R.objList=this.objMeta.map(o=>{
+        const pct=C.cov[o.key];
+        const vals=this.students.map(s=>s.cov[o.key]); const mx=Math.max(...vals,1);
+        const dist=vals.map(v=>({h:Math.round(v/mx*100), op:(0.5+0.5*v/mx).toFixed(2)}));
+        const rankNote=o.key===hiKey?'Highest coverage in the cohort — ':(o.key===loKey?'Lowest coverage in the cohort — ':'');
+        return {num:o.num,kr:o.kr,en:o.en,desc:o.desc,prompts:o.prompts,sites:o.sites,pct,dist,gap:rankNote+o.gap,reflection:''};
+      });
+    }
+
+    if(showGrid){
+      const maxMem=Math.max(...this.students.map(s=>s.mem),1);
+      R.studentCards=this.students.map(s=>({id:s.id,tag:s.tag,mem:s.mem.toLocaleString(),photo:s.photo.toLocaleString(),depth:s.depthAvg,obj:s.objAvg,topCity:s.topCity,cityColor:this.cityColors[s.topCity],memPct:Math.round(s.mem/maxMem*100),onClick:()=>set({student:s.idx,hover:null})}));
+    }
+
+    if(showDetail){
+      const s=this.students[S.student];
+      const delta=(v,base,unit,inv)=>{ const d=v-base; const sign=d>=0?'+':''; const up=inv?d<0:d>0; return {txt:sign+d+(unit||''), color:up?'#2f5d57':'#c0392b'}; };
+      const dm=delta(s.mem,Math.round(C.mem/N)), dd=delta(s.depthAvg,C.depthAvg,' chars'), doo=delta(s.objAvg,C.objAvg,'%'), dk=delta(s.krPct,C.krPct,'%');
+      const refs=[...s.places].sort((a,b)=>b.depth-a.depth).slice(0,3).map(p=>({site:p.name.length>20?p.name.slice(0,19)+'…':p.name,len:p.depth,text:'Avg. '+p.depth+' chars · '+p.mem+' records',cityColor:this.cityColors[p.city]}));
+      const objKR={space:'The Logic of Space',objects:'Objects and Classification',memory:'Public Memory & Ritual',unseen:'The Seen and the Unseen',authority:'Authority & Cultural Power'};
+      const ck=Object.keys(s.cov).sort((a,b)=>s.cov[b]-s.cov[a]);
+      const strongObj=objKR[ck[0]], weakObj=objKR[ck[ck.length-1]];
+      const rankOf=(key)=>{ const arr=[...this.students].sort((a,b)=>b[key]-a[key]); return arr.findIndex(x=>x.idx===s.idx)+1; };
+      const depthRank=rankOf('depthAvg'), objRank=rankOf('objAvg'), memRank=rankOf('mem');
+      const avgDepth=C.depthAvg, avgMem=Math.round(C.mem/N);
+      let signature, sigDesc;
+      if(s.depthAvg>=avgDepth+8 && s.mem<avgMem+40){ signature='Depth-First'; sigDesc='Stops less often but thinks long and deep'; }
+      else if(s.mem>=avgMem && s.depthAvg<avgDepth){ signature='Breadth-First'; sigDesc='Captures a great deal but only in passing'; }
+      else if(s.depthAvg>=avgDepth && s.mem>=avgMem){ signature='Both Breadth and Depth'; sigDesc='A rare type that sees broadly while digging deep'; }
+      else { signature='Balanced Observer'; sigDesc='Breadth and depth both near the cohort median'; }
+      const stMap={'Unseen-focused':[['Critical',54,'#6e3a36'],['Empathetic · Immersive',30,'#2f5d57'],['Descriptive',16,'#9a7b3f']],
+        'Memory & Ritual':[['Empathetic · Immersive',46,'#2f5d57'],['Critical',42,'#6e3a36'],['Descriptive',12,'#9a7b3f']],
+        'Space Analyst':[['Critical',50,'#6e3a36'],['Empathetic · Immersive',32,'#2f5d57'],['Descriptive',18,'#9a7b3f']],
+        'Classification Critic':[['Critical',52,'#6e3a36'],['Descriptive',26,'#9a7b3f'],['Empathetic · Immersive',22,'#2f5d57']],
+        'Power Gazer':[['Critical',44,'#6e3a36'],['Descriptive',32,'#9a7b3f'],['Empathetic · Immersive',24,'#2f5d57']]};
+      const stance=(stMap[s.tag]||[['Critical',40,'#6e3a36'],['Empathetic · Immersive',36,'#2f5d57'],['Descriptive',24,'#9a7b3f']]).map(([n,pct,color])=>({n,pct,color}));
+      const tpset=[]; [...s.places].sort((a,b)=>b.mem-a.mem).forEach(pl=>{ const cc=this.placeContent[pl.id]; if(cc&&cc.themes) cc.themes.slice(0,2).forEach(t=>{ if(!tpset.find(x=>x.n===t.n)) tpset.push(t); }); });
+      const sThemes=(tpset.length?tpset:ck.map(k=>({n:objKR[k],pct:s.cov[k]}))).slice(0,4);
+      const stmax=Math.max(...sThemes.map(t=>t.pct),1);
+      const kwset=new Set(); [...s.places].sort((a,b)=>b.mem-a.mem).forEach(pl=>{ const cc=this.placeContent[pl.id]; if(cc&&cc.keywords) cc.keywords.slice(0,2).forEach(k=>kwset.add(k)); });
+      const sKeywords=[...kwset].slice(0,7);
+      const critPctS=stance.find(x=>x.n==='Critical').pct;
+      const narrative=`In the cohort, ${s.id} is a "${signature}" — ${sigDesc}. With an average reflection depth of ${s.depthAvg} characters, this student ranks ${depthRank} in depth, and with ${s.objAvg}% objective coverage ranks ${objRank}. They are particularly strong on "${strongObj}" (${s.cov[ck[0]]}%) and comparatively weak on "${weakObj}" (${s.cov[ck[ck.length-1]]}%). Records concentrate in ${s.topCity}, and ${s.krPct}% of their thinking arrives in Korean.`;
+      R.curMeta={
+        signature, sigDesc, narrative,
+        ranks:[{l:'Depth Rank',v:depthRank+' / '+N},{l:'Objective Rank',v:objRank+' / '+N},{l:'Recording-Volume Rank',v:memRank+' / '+N},{l:'Critical Share',v:critPctS+'%'}],
+        strongObj, strongPct:s.cov[ck[0]]+'%', weakObj, weakPct:s.cov[ck[ck.length-1]]+'%',
+        stance,
+        themes:sThemes.map(t=>({n:t.n,pct:t.pct,w:Math.round(t.pct/stmax*100)})),
+        keywords:sKeywords.length?sKeywords:['Records','Observation','Circulation'],
+        strengths:[
+          {t:`${strongObj} ${s.cov[ck[0]]}%`, d:'The strongest critical objective, above the cohort average.'},
+          signature==='Depth-First'||signature==='Both Breadth and Depth'?{t:`Depth Rank ${depthRank} · ${s.depthAvg} chars`, d:'Lingers long at a single place and reflects at length.'}:{t:`Recording-Volume Rank ${memRank} · ${s.mem.toLocaleString()} memos`, d:'Captures the field broadly.'},
+        ],
+        growth:[
+          {t:`${weakObj} ${s.cov[ck[ck.length-1]]}%`, d:'The least-articulated objective — recommend applying it consciously at the next site.'},
+          signature==='Breadth-First'?{t:'Reinforce Depth', d:`Average depth is ${dd.txt} relative to the cohort — recommend one long-form reflection per day.`}:(s.krPct>C.krPct?{t:'Diversify Language', d:`High reliance on Korean at ${s.krPct}% — recommend reflecting in English.`}:{t:'Broaden Themes', d:'Records skewed toward a particular type — recommend extending attention to streets and everyday life.'}),
+        ],
+      };
+      R.cur={
+        id:s.id, tag:s.tag, cityColor:this.cityColors[s.topCity], initials:s.id.replace('S-',''),
+        stats:[{v:s.mem.toLocaleString(),l:'Memos'},{v:s.photo.toLocaleString(),l:'Photos'},{v:s.places.length,l:'Places'},{v:s.depthAvg+' chars',l:'Avg. Depth'},{v:s.objAvg+'%',l:'Objective Coverage'}],
+        compare:[
+          {label:'No. of Memos',val:s.mem.toLocaleString(),delta:dm.txt,color:dm.color},
+          {label:'Avg. Depth',val:s.depthAvg+' chars',delta:dd.txt,color:dd.color},
+          {label:'Objective Coverage',val:s.objAvg+'%',delta:doo.txt,color:doo.color},
+          {label:'Korean Share',val:s.krPct+'%',delta:dk.txt,color:dk.color},
+        ],
+        langBars:this.langOf(s.places,s.krPct/100*0.65),
+        topics:this.topicsOf(s.places),
+        refs,
+      };
+      R.dRadar=this.buildRadar(s.cov);
+      R.dScatter=this.buildScatter(s.places);
+      R.dRhythm=this.buildRhythm(s.rhythm);
+      R.dAnchorBars=this.buildBars(s.places);
+      R.dTopicDonut=this.buildDonut(this.topicsOf(s.places),s.mem.toLocaleString());
+      R.backToGrid=()=>set({student:null,hover:null});
+      R.prevStudent=()=>set({student:(S.student+N-1)%N,hover:null});
+      R.nextStudent=()=>set({student:(S.student+1)%N,hover:null});
+    }
+
+    if(showPlaceGrid){
+      R.placeCards=[...this.cohortPlaces].sort((a,b)=>b.mem-a.mem).map(p=>({
+        id:p.id, name:p.name.length>30?p.name.slice(0,29)+'…':p.name, topicKR:this.topicKR[p.topic], cityColor:this.cityColors[p.city],
+        mem:p.mem.toLocaleString(), photo:p.photo.toLocaleString(), depth:p.depth, students:scount[p.id]||0,
+        onClick:()=>set({place:p.id,hover:null})
+      }));
+    }
+
+    if(showPlaceDetail){
+      const p=this.cohortPlaces.find(x=>x.id===S.place);
+      const objKR={space:'The Logic of Space',objects:'Objects and Classification',memory:'Public Memory & Ritual',unseen:'The Seen and the Unseen',authority:'Authority & Cultural Power'};
+      const objBars = p.obj ? Object.keys(objKR).map(k=>({n:objKR[k],pct:Math.round((p.obj[k]||0)*100)})).filter(b=>b.pct>0).sort((a,b)=>b.pct-a.pct) : [];
+      const cc=this.placeContent[p.id];
+      const depths=this.students.map(st=>{const pp=st.places.find(x=>x.id===p.id); return pp?pp.depth:null;}).filter(v=>v!=null);
+      const med=depths.length?[...depths].sort((a,b)=>a-b)[Math.floor(depths.length/2)]:p.depth;
+      const krPct=Math.round(Math.max(8,Math.min(92,(this.typeKorean[p.topic]||.5)*(this.cohort.krPct/100/0.62)*100)));
+      const enPct=Math.max(0,100-krPct-3), other=100-krPct-enPct;
+      let themes,stance,keywords,meta,photos,notes,converge,synth;
+      if(cc){ themes=cc.themes; stance=cc.stance; keywords=cc.keywords; meta=cc.meta; photos=cc.photos; notes=cc.notes; converge=cc.converge; synth=cc.synth; }
+      else {
+        const tops=objBars.slice(0,3);
+        themes=tops.length?tops.map(b=>({n:b.n,pct:b.pct})):[{n:'Visual Capture',pct:68},{n:'Scene Description',pct:44},{n:'Atmosphere',pct:30}];
+        const street=p.topic==='Street'||p.topic==='Park'||p.topic==='Other';
+        stance=street?[{n:'Descriptive',pct:60,color:'#9a7b3f'},{n:'Empathetic · Immersive',pct:28,color:'#2f5d57'},{n:'Critical',pct:12,color:'#6e3a36'}]
+                     :[{n:'Critical',pct:45,color:'#6e3a36'},{n:'Empathetic · Immersive',pct:33,color:'#2f5d57'},{n:'Descriptive',pct:22,color:'#9a7b3f'}];
+        keywords=[this.topicKR[p.topic],'Visual','Scene','Atmosphere'];
+        meta='Records at this place tend to be short and improvised; rather than converging on a particular frame, observations among students stay at the level of individual impressions. It is less an object of deep analysis than a connecting point along the route.';
+        photos=[{note:'A scene captured in passing',id:'—',theme:this.topicKR[p.topic]},{note:'An atmosphere-driven capture',id:'—',theme:'Impression'}];
+        notes=[]; converge='Low · '+themes[0].pct+'%';
+        synth='A place with mostly short, improvised records. The focus is on visual capture rather than deep analysis, and the direct connection to the learning objectives is weak.';
+      }
+      const tmax=Math.max(...themes.map(t=>t.pct),1);
+      const critPct=(stance.find(x=>x.n==='Critical')||{}).pct||0;
+      R.curPlace={
+        name:p.name, city:p.city, cityColor:this.cityColors[p.city], topicKR:this.topicKR[p.topic],
+        mem:p.mem.toLocaleString(), photo:p.photo.toLocaleString(), depth:p.depth+' chars', students:(scount[p.id]||0)+' students',
+        objBars, hasObj:objBars.length>0,
+        synth, meta, converge, krPctTxt:krPct+'%', medTxt:med+' chars',
+        themes: themes.map(t=>({n:t.n,pct:t.pct,w:Math.round(t.pct/tmax*100)})),
+        stance, keywords,
+        photos, hasPhotos:photos.length>0,
+        notes: notes.map(n=>({...n,langColor:n.lang==='KR'?'#6e3a36':'#2f5d57'})), hasNotes:notes.length>0,
+        compare:[
+          {label:'Recording Students',val:(scount[p.id]||0)+' students'},
+          {label:'Median Depth',val:med+' chars'},
+          {label:'Korean',val:krPct+'%'},
+          {label:'Observation Convergence',val:converge},
+        ],
+      };
+      R.placeHist=this.buildHistogram(depths.length?depths:[p.depth],'#6e3a36');
+      R.placeLangDonut=this.buildDonut([{pct:krPct,color:'#6e3a36'},{pct:enPct,color:'#c7b29a'},{pct:other,color:'#e2d8c6'}], krPct+'%', 'Korean');
+      R.backToPlaces=()=>set({place:null,hover:null});
+    }
+
+    if(isDiagnose){
+      const ranked=[...this.objMeta].sort((a,b)=>C.cov[b.key]-C.cov[a.key]);
+      const hi=ranked[0], lo=ranked[ranked.length-1], hi2=ranked[1];
+      const sm=[...this.students].map(s=>s.mem).sort((a,b)=>a-b), sd=[...this.students].map(s=>s.depthAvg).sort((a,b)=>a-b);
+      const medMem=sm[Math.floor(N/2)], medDepth=sd[Math.floor(N/2)];
+      const skimmers=this.students.filter(s=>s.mem>medMem&&s.depthAvg<medDepth);
+      const maxDepth=Math.max(...this.students.map(s=>s.depthAvg),1), maxObj=Math.max(...this.students.map(s=>s.objAvg),1);
+      const flags=this.students.filter(s=>s.objAvg<C.objAvg-4||s.depthAvg<C.depthAvg-12||(s.mem>medMem&&s.depthAvg<medDepth)).map(s=>{
+        const issues=[]; const depthLow=s.depthAvg<C.depthAvg-12, objLow=s.objAvg<C.objAvg-4, skim=s.mem>medMem&&s.depthAvg<medDepth;
+        if(depthLow) issues.push('Depth'); if(objLow) issues.push('Objective'); if(skim) issues.push('Breadth Only');
+        return {id:s.id, tag:s.tag, cityColor:this.cityColors[s.topCity],
+          depthVal:s.depthAvg+' chars', depthPct:Math.round(s.depthAvg/maxDepth*100), depthLow,
+          objVal:s.objAvg+'%', objPct:Math.round(s.objAvg/maxObj*100), objLow,
+          depthDelta:(s.depthAvg-C.depthAvg)+' chars', objDelta:(s.objAvg-C.objAvg)+'%',
+          issues:issues.join(' · '), severity:issues.length, sevColor:issues.length>=2?'#c0392b':'#c9892f'};
+      }).sort((a,b)=>b.severity-a.severity);
+      const flaggedIds=flags.map(f=>f.id);
+      const skimmersN=skimmers.length;
+      const deepest=[...this.cohortPlaces].sort((a,b)=>b.depth-a.depth)[0];
+      R.diag={
+        verdict:`Strength: ${hi.kr} · Gap: ${lo.kr}`,
+        summary:`The cohort is strong on "${hi.kr}" (${C.cov[hi.key]}%) and "${hi2.kr}" (${C.cov[hi2.key]}%), but markedly weak on the most difficult critical objective, "${lo.kr}" (${C.cov[lo.key]}%). The average reflection depth is ${C.depthAvg} characters, and ${C.krPct}% of the memos are written in Korean, indicating a heavy reliance on the mother tongue for meaning-making.`,
+        score:C.objAvg,
+        strengths:[
+          {t:`${hi.kr} ${C.cov[hi.key]}%`, d:'The critical objective articulated most clearly at museums and memorial sites.'},
+          {t:`Deepest Reflection · ${deepest.name.slice(0,22)}`, d:`Averaging ${deepest.depth} characters — memorial and historic sites drew out long contemplation.`},
+          {t:`Strong On-Site Engagement`, d:'The tourist cities (Philadelphia and DC) were recorded 2–3 times more densely than the home base.'},
+        ],
+        gaps:[
+          {t:`${lo.kr} ${C.cov[lo.key]}%`, d:'The objective that asks what is concealed and excluded was the least practiced.'},
+          {t:'Skewed Objects of Analysis', d:'Critique concentrates on "designed space" (museums), while streets and everyday life remain at simple capture.'},
+          {t:`Language Reliance: ${C.krPct}% Korean`, d:'A lack of the metalinguistic distance that comes from reflecting in the language of the site (English).'},
+          {t:`${skimmersN} Breadth-Only Students`, d:'Many records but average depth below the median — mostly fleeting entries.'},
+        ],
+        objBalance: ranked.map(o=>({kr:o.kr,pct:C.cov[o.key],barColor:o.key===lo.key?'#c0392b':'#2f5d57'})),
+        flags, flagCount:flags.length,
+        recs:[
+          {text:`Strengthen "${lo.kr}" — require at least one frame on "what is invisible" even at street and everyday sites.`, pri:'High Priority', priColor:'#c0392b', affect:`Objective ${C.cov[lo.key]}% → Objective 70%+`},
+          {text:'Place critical on-site prompts outside the museums (streets and parks) to break the skew in objects of analysis.', pri:'Structural Improvement', priColor:'#9a7b3f', affect:'Streets · Everyday, many'},
+          {text:`Have students write one core reflection in English to secure metalinguistic distance.`, pri:'Language', priColor:'#2f5d57', affect:`Currently ${C.krPct}% Korean`},
+          {text:`Assign a daily "long-form reflection" at one site to students with broad breadth and shallow depth.`, pri:'Individual Coaching', priColor:'#3f4a63', affect:`${skimmersN} students affected`},
+        ].map((r,i)=>({...r,num:String(i+1).padStart(2,'0')})),
+        rings: ranked.map(o=>({kr:o.kr, ring:this.buildRing(C.cov[o.key], o.key===lo.key?'#c0392b':'#2f5d57', '')})),
+      };
+      R.diagQuadrant=this.buildQuadrant(flaggedIds);
+      R.diagScoreRing=this.buildRing(C.objAvg,'#6e3a36','Objective Avg.');
+    }
+
+    return R;
+  }
+}
+
+</script>
+</body>
+</html>
