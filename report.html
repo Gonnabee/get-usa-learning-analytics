@@ -493,7 +493,9 @@ function edaDepth(){const B=D.depth,W=700,Ht=180,m={l:10,r:10,t:12,b:30};
  g.append('rect').attr('x',d=>x(d[0])).attr('width',x.bandwidth()).attr('y',d=>y(d[1])).attr('height',d=>y(0)-y(d[1])).attr('rx',3).attr('fill',d=>d[2]);
  g.append('text').attr('x',d=>x(d[0])+x.bandwidth()/2).attr('y',d=>y(d[1])-6).attr('text-anchor','middle').attr('class','lab').style('font-weight',600).text(d=>d[1]);
  g.append('text').attr('x',d=>x(d[0])+x.bandwidth()/2).attr('y',Ht-10).attr('text-anchor','middle').attr('class','axt').text(d=>d[0]);}
-function radar(sel){const sv=d3.select(sel);const cx=160,cy=155,R=110;const obj=D.objcov,n=obj.length,mx=d3.max(obj,d=>d.pct);
+function radar(sel){const sv=d3.select(sel);sv.selectAll('*').remove();
+ const cx=210,cy=146,R=86;const obj=D.objcov,n=obj.length;
+ const mx=Math.ceil(d3.max(obj,d=>d.pct)/5)*5;                 // axis headroom so the top vertex doesn't sit on the grid
  const ang=i=>-Math.PI/2+i*2*Math.PI/n;
  [.25,.5,.75,1].forEach(f=>sv.append('polygon').attr('points',obj.map((d,i)=>[cx+Math.cos(ang(i))*R*f,cy+Math.sin(ang(i))*R*f].join(',')).join(' ')).attr('fill','none').attr('stroke','#e4ddcd'));
  obj.forEach((d,i)=>sv.append('line').attr('x1',cx).attr('y1',cy).attr('x2',cx+Math.cos(ang(i))*R).attr('y2',cy+Math.sin(ang(i))*R).attr('stroke','#e4ddcd'));
@@ -501,9 +503,12 @@ function radar(sel){const sv=d3.select(sel);const cx=160,cy=155,R=110;const obj=
  sv.append('polygon').attr('points',dp.map(p=>p.join(',')).join(' ')).attr('fill','rgba(45,58,87,.16)').attr('stroke','#2d3a57').attr('stroke-width',2);
  dp.forEach((p,i)=>sv.append('circle').attr('cx',p[0]).attr('cy',p[1]).attr('r',3.5).attr('fill',OBJCOL[obj[i].id])
    .on('mousemove',(e)=>show(e,`<b>${obj[i].label}</b> · ${obj[i].n} (${obj[i].pct}%)`)).on('mouseleave',hide));
- obj.forEach((d,i)=>{const a=ang(i);sv.append('text').attr('x',cx+Math.cos(a)*(R+20)).attr('y',cy+Math.sin(a)*(R+15))
-   .attr('text-anchor',Math.abs(Math.cos(a))<.3?'middle':(Math.cos(a)>0?'start':'end')).attr('class','lab').style('font-weight',600).style('font-size','10.5px')
-   .style('fill',OBJCOL[d.id]).text(d.label);});}
+ const wrap=s=>{const w=s.split(' ');if(s.length<=18||w.length<2)return [s];let best=1,bd=1e9;for(let k=1;k<w.length;k++){const a=w.slice(0,k).join(' ').length,b=w.slice(k).join(' ').length,diff=Math.abs(a-b);if(diff<bd){bd=diff;best=k;}}return [w.slice(0,best).join(' '),w.slice(best).join(' ')];};
+ obj.forEach((d,i)=>{const a=ang(i),lx=cx+Math.cos(a)*(R+16),ly=cy+Math.sin(a)*(R+14);
+   const anc=Math.abs(Math.cos(a))<.3?'middle':(Math.cos(a)>0?'start':'end');
+   const lines=wrap(d.label),y0=ly-(lines.length-1)*5.5;
+   const t=sv.append('text').attr('x',lx).attr('y',y0).attr('text-anchor',anc).attr('class','lab').style('font-weight',600).style('font-size','10px').style('fill',OBJCOL[d.id]);
+   lines.forEach((ln,k)=>t.append('tspan').attr('x',lx).attr('dy',k===0?0:11).text(ln));});}
 
 const s=location.hash.slice(1);if(s&&document.getElementById(s))go(s);else draw('p1');
 </script></body></html>
