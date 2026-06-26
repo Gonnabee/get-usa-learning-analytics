@@ -60,6 +60,27 @@ pre .c{color:#a59a87}pre .k{color:#e0a0aa}pre .s{color:#9ecdb0}pre .n{color:#c9a
 .diag{background:#241c14;color:#ece2cf;border-radius:11px;padding:16px 18px;margin:16px 0;font-family:var(--mono);font-size:12.5px;line-height:1.85}
 .diag .h{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#b3a78f;margin-bottom:8px}
 .diag .ok{color:#9ecdb0}.diag .no{color:#e0a0aa}.diag .hi{color:#e8c98a}.diag .kk{color:#9fb6d6}
+/* structured diagnostics (cards + callout) */
+.diagx{background:#241c14;border-radius:12px;padding:18px;margin:16px 0;color:#ece2cf}
+.diagx .dxhead{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#b3a78f;margin-bottom:14px}
+.dxgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:780px){.dxgrid{grid-template-columns:1fr}}
+.dxcard{background:#2e2419;border:1px solid #3d3122;border-radius:10px;padding:13px 14px;display:flex;flex-direction:column;gap:9px}
+.dxtop{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dxname{font-family:var(--mono);font-weight:600;font-size:13px;color:#e8c98a;letter-spacing:.02em}
+.dxq{font-size:12px;color:#c9bda7}
+.dxsub{font-family:var(--mono);font-size:10.5px;color:#9a8f7b;margin-top:-3px}
+.dxstats{display:flex;flex-wrap:wrap;gap:6px}
+.dxstats .st{font-family:var(--mono);font-size:11px;background:#1f1810;border:1px solid #3d3122;border-radius:6px;padding:3px 8px;color:#d8ccb6}
+.dxstats .st b{color:#fff;font-weight:600}
+.dxstats .st.ok{color:#9ecdb0;border-color:#3a5045}.dxstats .st.ok b{color:#bfe6cf}
+.dxstats .st.no{color:#e0a0aa;border-color:#5a3a40}.dxstats .st.no b{color:#f0c2c8}
+.dxstats .st.hi b{color:#f0d49a}
+.dxtake{font-size:12.5px;line-height:1.55;color:#ece2cf;border-top:1px dashed #3d3122;padding-top:9px;margin-top:auto}
+.dxtake b{color:#fff;font-weight:600}
+.dxlimit{margin-top:12px;background:#2a1c1c;border:1px solid #5a3a40;border-radius:9px;padding:11px 14px;font-size:12px;line-height:1.6;color:#e7cfd0}
+.dxlimit .dxwarn{font-family:var(--mono);font-weight:600;color:#e0a0aa;margin-right:6px}
+.dxlimit b{color:#fff;font-weight:600}
 .cards{display:grid;gap:14px;margin:18px 0}.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:repeat(3,1fr)}
 @media(max-width:760px){.c2,.c3{grid-template-columns:1fr}}
 .cd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 18px}
@@ -92,7 +113,7 @@ svg{display:block;width:100%;overflow:visible}.axt{font-family:var(--mono);font-
     <li data-p="p6"><span class="no">06</span><span class="t">Recommendations & Decision Support<span class="en">Recommendations</span></span></li>
     <li data-p="p7"><span class="no">07</span><span class="t">Reflection, Limitations & Future<span class="en">Reflection & Limits</span></span></li>
   </ul>
-  <div class="sidefoot"><a class="dash-btn" href="learning-console.dc.html" target="_blank">Live Dashboard <span class="ar">→</span></a></div>
+  <div class="sidefoot"><a class="dash-btn" href="console.html" target="_blank">Live Dashboard <span class="ar">→</span></a></div>
 </aside>
 
 <main class="main">
@@ -275,7 +296,7 @@ embedding clusters: silhouette maximized → k = <span class="ok">7</span>  <spa
   <p>City colors over Paper <code>#f6f2e9</code> (Teal · NY / Ochre · Phila / Burgundy · DC / Navy). Type is the display face
   Source Serif 4, body IBM Plex Sans KR, and data labels IBM Plex Mono. Clarity principle: small elements appear on hover,
   and labels use automatic contrast based on background lightness.</p>
-  <a class="dash-btn" href="learning-console.dc.html" target="_blank" style="display:inline-block;padding:11px 20px;margin-top:6px">Open Live Dashboard <span class="ar">→</span></a>
+  <a class="dash-btn" href="console.html" target="_blank" style="display:inline-block;padding:11px 20px;margin-top:6px">Open Live Dashboard <span class="ar">→</span></a>
   <div class="pager"><a data-go="p3">← 03</a><a data-go="p5">05 · Insights & Findings →</a></div>
 </section>
 
@@ -299,20 +320,53 @@ embedding clusters: silhouette maximized → k = <span class="ok">7</span>  <spa
   </div>
 
   <h2>Statistical Diagnostics — How Do the Sites Differ?</h2>
-  <div class="diag"><div class="h">Inferential diagnostics · exact tests + effect sizes</div>
-MANOVA  City → (memories, photos)   place-level n=46  (NY 28 · Phila 6 · DC 12)
-   Wilks Λ = <span class="hi">0.955</span>   Pillai = 0.045
-   <span class="kk">exact</span> F(4,84) = <span class="hi">0.49</span>   p = <span class="no">0.747  (not significant)</span>
-   → Photos are ~1.3 per memory across all cities. <span class="kk">The 'structure' of recording is independent of city (p=2 exact F)</span>
-Chi-square  City × place type   memo-level n=554
-   χ² = <span class="hi">562</span>   df = 10   p &lt; 1e-100   Cramér's V = <span class="ok">0.71 (large)</span>
-   [place-level n=46] χ² = 28.9   p = <span class="ok">0.001</span>   V = <span class="ok">0.56 (large)</span>
-   → What was recorded differs starkly. <span class="kk">NY=streets · DC=museums/memorials · Phila=parks</span>
-GoF  Objective coverage vs uniform   mapped n=426
-   χ²(4) = <span class="hi">61.4</span>   p = <span class="ok">1.5e-12</span>   Cohen's w = <span class="ok">0.38</span>
-   → Not uniform: <span class="hi">O4 Revealing over-represented (136)</span> · <span class="no">O5 Authority under-represented (37)</span>
-<span class="no">⚠ Limitation</span>: Memos cluster within student and place (pseudoreplication) + some cells have expected frequency &lt;5
-   → <span class="kk">p-values are secondary; effect sizes (V·w) and visual patterns are the primary evidence</span></div>
+  <div class="diagx">
+    <div class="dxhead">Inferential diagnostics · exact tests + effect sizes</div>
+    <div class="dxgrid">
+
+      <div class="dxcard">
+        <div class="dxtop"><span class="dxname">MANOVA</span><span class="dxq">City → (memories, photos)</span></div>
+        <div class="dxsub">place-level n = 46 · NY 28 · Phila 6 · DC 12</div>
+        <div class="dxstats">
+          <span class="st hi">Wilks Λ <b>0.955</b></span>
+          <span class="st">Pillai <b>0.045</b></span>
+          <span class="st hi">exact F(4,84) <b>0.49</b></span>
+          <span class="st no">p = 0.747 · <b>n.s.</b></span>
+        </div>
+        <div class="dxtake">Photos run ≈ <b>1.3 per memory</b> in every city — the <b>structure</b> of recording is independent of city.</div>
+      </div>
+
+      <div class="dxcard">
+        <div class="dxtop"><span class="dxname">Chi-square</span><span class="dxq">City × place type</span></div>
+        <div class="dxsub">memo-level n = 554 · [place-level n = 46]</div>
+        <div class="dxstats">
+          <span class="st hi">χ² <b>562</b></span>
+          <span class="st">df <b>10</b></span>
+          <span class="st">p &lt; <b>1e-100</b></span>
+          <span class="st ok">Cramér's V <b>0.71</b> · large</span>
+          <span class="st ok">place-level V <b>0.56</b> · large</span>
+        </div>
+        <div class="dxtake"><b>What</b> was recorded differs starkly: NY = streets · DC = museums / memorials · Phila = parks.</div>
+      </div>
+
+      <div class="dxcard">
+        <div class="dxtop"><span class="dxname">Goodness-of-fit</span><span class="dxq">Objective coverage vs uniform</span></div>
+        <div class="dxsub">mapped n = 426</div>
+        <div class="dxstats">
+          <span class="st hi">χ²(4) <b>61.4</b></span>
+          <span class="st ok">p <b>1.5e-12</b></span>
+          <span class="st ok">Cohen's w <b>0.38</b></span>
+        </div>
+        <div class="dxtake">Not uniform — <b>O4 Revealing over-represented (136)</b>, O5 Authority under-represented (37).</div>
+      </div>
+
+    </div>
+    <div class="dxlimit">
+      <span class="dxwarn">⚠ Limitation</span>
+      Memos cluster within student and place (pseudoreplication), and some cells have expected frequency &lt; 5.
+      <b>p-values are secondary — effect sizes (V, w) and the visual patterns are the primary evidence.</b>
+    </div>
+  </div>
   <p class="s">A non-significant MANOVA is not a failure but a finding — <b>sites are different 'topics,' not different 'recording structures.'</b>
   Volume and topic (V=0.56–0.71, large effect) divide the cities, whereas the photo–memo relationship does not.
   Because of non-independence and sparse cells, we read p conservatively and treat <b>effect size as the primary evidence</b>.</p>
@@ -383,7 +437,7 @@ GoF  Objective coverage vs uniform   mapped n=426
   <p class="s"><code>prep_console.py · prep_text.py</code> preprocessing · <code>feedback_stats.json</code> statistics ·
   <code>console.html</code> live dashboard · <code>dashboard.html · 4-memory-timeline.html</code> supplementary visualizations ·
   EDA distribution/correlation outputs · design iteration v1→v2 · MANOVA, clustering, and language code snippets.</p>
-  <div class="pager"><a data-go="p6">← 06</a><a class="dash-btn" href="learning-console.dc.html" target="_blank" style="display:inline-block;padding:9px 16px">Live Dashboard →</a></div>
+  <div class="pager"><a data-go="p6">← 06</a><a class="dash-btn" href="console.html" target="_blank" style="display:inline-block;padding:9px 16px">Live Dashboard →</a></div>
 </section>
 
 </main>
