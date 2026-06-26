@@ -8,9 +8,8 @@
  --ny:#2f5d57;--phl:#9a7b3f;--dc:#6e3a36;--navy:#3f4a63;
  --serif:'Source Serif 4',Georgia,serif;--sans:'IBM Plex Sans KR',sans-serif;--mono:'IBM Plex Mono',monospace;}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;
- min-height:100vh;display:flex;align-items:center;justify-content:center;padding:48px 24px}
-.wrap{max-width:1040px;width:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.7;padding:48px 24px 64px}
+.wrap{max-width:1040px;width:100%;margin:0 auto}
 .kick{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--phl);font-weight:500}
 h1{font-family:var(--serif);font-weight:700;font-size:clamp(38px,6vw,64px);line-height:1.04;letter-spacing:-.015em;margin:14px 0 6px}
 h1 .en{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42em;color:var(--soft);display:block;margin-top:8px}
@@ -37,10 +36,44 @@ h1 .en{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42e
 .note b{color:var(--soft);font-weight:600}
 .note a{color:var(--ny);text-decoration:none;border-bottom:1px solid #bcd0cb}
 .foot{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--mut)}
+
+/* ---- Field gallery ---- */
+.gallery{margin-top:54px;border-top:1px solid var(--line);padding-top:36px}
+.gh .gt{font-family:var(--serif);font-weight:700;font-size:clamp(26px,3.6vw,36px);letter-spacing:-.01em;margin:10px 0 6px}
+.gh .gp{font-size:14.5px;color:var(--soft);max-width:680px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:16px;margin-top:24px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;
+ transition:.18s;display:flex;flex-direction:column}
+.pc:hover{transform:translateY(-3px);border-color:#cdbfa3;box-shadow:0 18px 36px -26px rgba(60,40,10,.5)}
+.pbar{height:3px;width:100%}
+.pimg{position:relative;aspect-ratio:4/5;background:#efe9dc;cursor:pointer;overflow:hidden;
+ display:flex;align-items:center;justify-content:center}
+.pimg img{width:100%;height:100%;object-fit:cover;display:block}
+.pimg .pnum{position:absolute;left:10px;top:9px;font-family:var(--mono);font-size:11px;font-weight:500;
+ color:#fff;background:rgba(33,31,27,.55);padding:2px 7px;border-radius:6px;backdrop-filter:blur(2px)}
+.pimg.empty{background:repeating-linear-gradient(135deg,#efe9dc,#efe9dc 11px,#ece5d6 11px,#ece5d6 22px)}
+.pimg.empty .ph{display:flex;flex-direction:column;align-items:center;gap:6px;color:#b6ac99;font-family:var(--mono);
+ font-size:11px;letter-spacing:.06em;text-align:center;padding:14px}
+.pimg.empty .ph svg{width:30px;height:30px;opacity:.6}
+.pimg.ok .ph{display:none}
+.pimg:not(.empty) .ph{display:none}
+figcaption{padding:12px 13px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pk{font-family:var(--mono);font-size:10px;letter-spacing:.05em;color:var(--mut);text-transform:uppercase;line-height:1.4}
+.pcap{font-family:var(--serif);font-size:14.5px;line-height:1.32;color:var(--ink);font-weight:600}
+.ptag{align-self:flex-start;margin-top:auto;font-family:var(--mono);font-size:10px;color:var(--c,var(--navy));
+ border:1px solid color-mix(in srgb,var(--c,var(--navy)) 35%,var(--line));border-radius:20px;padding:3px 9px}
+.gnote{margin-top:18px;font-size:12px;color:var(--mut);line-height:1.6}
+.gnote b{color:var(--soft);font-weight:600}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(20,18,14,.9);display:none;align-items:center;justify-content:center;
+ flex-direction:column;gap:14px;z-index:50;padding:32px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:min(94vw,1100px);max-height:80vh;object-fit:contain;border-radius:8px;box-shadow:0 30px 80px -20px #000}
+.lbcap{color:#f3efe6;font-family:var(--serif);font-size:15px;text-align:center;max-width:680px}
 </style></head><body>
 <div class="wrap">
   <div class="kick">Taejae University · GET USA · 2026.03.29–04.02</div>
-  <h1>Record & Journey<span class="en">The Seen and The Unseen — Measuring Learning in the Field</span></h1>
+  <h1>Record &amp; Journey<span class="en">The Seen and The Unseen — Measuring Learning in the Field</span></h1>
   <p class="dek">Drawing on the <b>750 notes and 947 photographs</b> produced by 24 students during a critical museology field study,
   we reconstruct the data as a <b>learning analysis</b> of "where they lingered, what they attended to, and how they reached the learning objectives."</p>
 
@@ -73,14 +106,88 @@ h1 .en{font-family:var(--serif);font-style:italic;font-weight:400;font-size:.42e
     </a>
   </div>
 
+  <!-- ====== FIELD GALLERY ====== -->
+  <section class="gallery" id="gallery">
+    <div class="gh">
+      <div class="kick">In the Field · 현장의 시선</div>
+      <h2 class="gt">What the lens lingered on</h2>
+      <p class="gp">Seventeen frames from the five-day study — the same attention the data measures, seen directly.
+      Each photo is tagged with the place and the learning objective it speaks to. Click any frame to enlarge.</p>
+    </div>
+    <div class="grid" id="pgrid"></div>
+    <div class="gnote" id="gnote"></div>
+  </section>
+
   <div class="note">
     <b>Data and statistics note.</b> The presentation report (02) and the live-data dashboard draw on the actual export (<b>24 students · 750 notes · 947 photos</b>) and
     <b>validated statistics</b> — for MANOVA, the p=2 exact F(4,84)=0.49, p=0.747 (non-significant); for city × topic, Cramér's V=0.56–0.71 (large);
     and for objective fit, χ²(4)=61.4, Cohen's w=0.38. Because the notes are non-independent and some cells are sparse, we read the <b>effect sizes as the primary evidence</b>.
     The interactive dashboard (01) is <b>computed from the same actual export</b> — the per-student breakdown reflects direct measurement by user_id in the CSV (16 of the 24 students
     recorded at places mapped to a learning objective), and the objective coverage uses the <b>same primary-objective distribution</b> as the report (unseen 32% · authority 9%).
-    Supplementary visualizations: <a href="learning-console.dc.html">console.html</a> · <a href="learning-console.dc.html">4-memory-timeline.html</a>.
   </div>
-  <div class="foot">Record & Journey · FieldAtlas export 2026-04-10 · n=750</div>
+  <div class="foot">Record &amp; Journey · FieldAtlas export 2026-04-10 · n=750</div>
 </div>
+
+<div class="lb" id="lb"><img id="lbimg" alt=""><div class="lbcap" id="lbcap"></div></div>
+
+<script>
+const PHOTOS=[
+ {file:"01_liberty.jpg",place:"US Holocaust Memorial Museum",city:"Washington DC",obj:"unseen",cap:"Liberty raised over the crowd"},
+ {file:"02_visa-wall.jpg",place:"US Holocaust Memorial Museum",city:"Washington DC",obj:"unseen",cap:"“The inhumanity of our times” — a wall of refugee paperwork"},
+ {file:"03_boycott.jpg",place:"US Holocaust Memorial Museum",city:"Washington DC",obj:"authority",cap:"“Don’t buy German goods” — the 1930s boycott"},
+ {file:"04_contemplative.jpg",place:"Nat. Museum of African American History",city:"Washington DC",obj:"memory",cap:"Contemplative Court — water falling through light"},
+ {file:"05_baldwin.jpg",place:"Nat. Museum of African American History",city:"Washington DC",obj:"memory",cap:"“History is literally present in all that we do.” — James Baldwin"},
+ {file:"06_in-motion.jpg",place:"Nat. Museum of African American History",city:"Washington DC",obj:"unseen",cap:"In Motion: Movement and Migration"},
+ {file:"07_no-way.jpg",place:"Nat. Museum of African American History",city:"Washington DC",obj:"unseen",cap:"Making a Way Out of No Way"},
+ {file:"08_jefferson-statue.jpg",place:"Thomas Jefferson Memorial",city:"Washington DC",obj:"memory",cap:"Jefferson beneath the dome"},
+ {file:"09_jefferson-text.jpg",place:"Thomas Jefferson Memorial",city:"Washington DC",obj:"authority",cap:"“Almighty God hath created the mind free”"},
+ {file:"10_indian-purpose.jpg",place:"Nat. Museum of the American Indian",city:"Washington DC",obj:"unseen",cap:"“…the inherent right of all people to retain spiritual and cultural values.”"},
+ {file:"11_nmai-bronze.jpg",place:"Nat. Museum of the American Indian",city:"Washington DC",obj:"objects",cap:"Diplomacy in bronze"},
+ {file:"12_sketch.jpg",place:"Field notebook",city:"Washington DC",obj:"space",cap:"Drawing the room — a record of the record"},
+ {file:"13_library-congress.jpg",place:"Library of Congress",city:"Washington DC",obj:"authority",cap:"“Reading maketh a full man”"},
+ {file:"14_capitol.jpg",place:"United States Capitol",city:"Washington DC",obj:"authority",cap:"On the Capitol steps"},
+ {file:"15_crossing.jpg",place:"Washington Crossing relief",city:"Washington DC",obj:"memory",cap:"Washington crosses the Delaware (bronze relief)"},
+ {file:"16_independence.jpg",place:"Independence Hall",city:"Philadelphia",obj:"memory",cap:"Independence Hall across the green"},
+ {file:"17_antislavery.jpg",place:"Nat. Museum of African American History",city:"Washington DC",obj:"unseen",cap:"“The Anti-Slavery Record,” 1835"}
+];
+const OBJ={space:"Space as Argument",objects:"Objects & Classification",memory:"Public Memory & Ritual",unseen:"The Seen / The Unseen",authority:"Authority & Power"};
+const CITYCOL={"Washington DC":"var(--dc)","Philadelphia":"var(--phl)","New York":"var(--ny)"};
+const CAM='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8h3l1.5-2h9L18 8h3v11H3z"/><circle cx="12" cy="13" r="3.4"/></svg>';
+const grid=document.getElementById("pgrid"); let have=0;
+PHOTOS.forEach((p,i)=>{
+  const col=CITYCOL[p.city]||"var(--navy)";
+  const fig=document.createElement("figure"); fig.className="pc";
+  fig.innerHTML=`<div class="pbar" style="background:${col}"></div>
+   <div class="pimg empty">
+     <img loading="lazy" alt="${p.cap.replace(/"/g,'&quot;')}">
+     <span class="ph">${CAM}<span>${String(i+1).padStart(2,'0')}</span></span>
+     <span class="pnum">${String(i+1).padStart(2,'0')}</span>
+   </div>
+   <figcaption>
+     <div class="pk">${p.place} · ${p.city}</div>
+     <div class="pcap">${p.cap}</div>
+     <span class="ptag" style="--c:${col}">${OBJ[p.obj]||p.obj}</span>
+   </figcaption>`;
+  const box=fig.querySelector(".pimg"), img=fig.querySelector("img");
+  img.onload=()=>{box.classList.remove("empty");box.classList.add("ok");have++;updateNote();};
+  img.onerror=()=>{img.remove();};
+  img.src="photos_site/"+p.file;
+  box.addEventListener("click",()=>{ if(box.classList.contains("ok")) openLB(p,i); });
+  grid.appendChild(fig);
+});
+function updateNote(){
+  const n=document.getElementById("gnote");
+  n.innerHTML=`<b>${have} of ${PHOTOS.length}</b> field photographs loaded · captioned by place and learning objective.`;
+}
+function openLB(p,i){
+  const lb=document.getElementById("lb");
+  document.getElementById("lbimg").src="photos_site/"+p.file;
+  document.getElementById("lbcap").textContent=`${String(i+1).padStart(2,'0')} · ${p.place} — ${p.cap}`;
+  lb.classList.add("on");
+}
+document.getElementById("lb").addEventListener("click",e=>e.currentTarget.classList.remove("on"));
+// initial note (in case no images yet)
+setTimeout(()=>{ if(!have){document.getElementById("gnote").innerHTML=
+ '<b>Captions are in place.</b> Drop the trip photos into <code>photos_site/</code> (named 01–16) and they appear here automatically.';}},400);
+</script>
 </body></html>
